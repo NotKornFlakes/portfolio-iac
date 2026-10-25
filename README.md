@@ -1,7 +1,7 @@
 # Portfolio Site on Cloudflare — Infrastructure as Code
 
-![Terraform CI](https://github.com/NotKornFlakes/azure-portfolio-iac/actions/workflows/terraform-ci.yml/badge.svg)
-![Terraform Deploy](https://github.com/NotKornFlakes/azure-portfolio-iac/actions/workflows/terraform-deploy.yml/badge.svg)
+![Terraform CI](https://github.com/NotKornFlakes/portfolio-iac/actions/workflows/terraform-ci.yml/badge.svg)
+![Terraform Deploy](https://github.com/NotKornFlakes/portfolio-iac/actions/workflows/terraform-deploy.yml/badge.svg)
 
 A static portfolio website served by **Cloudflare Workers static assets**, provisioned entirely with **Terraform** (`cloudflare` provider) and deployed by **GitHub Actions**. Terraform state lives in **Cloudflare R2**. There is no origin server.
 
