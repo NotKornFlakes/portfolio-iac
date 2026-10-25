@@ -1,15 +1,9 @@
 # Copy this file to terraform.tfvars and fill in your values.
-# terraform.tfvars is git-ignored so your subscription ID stays off GitHub.
+# terraform.tfvars is git-ignored so your IDs and token stay off GitHub.
 
-subscription_id = "00000000-0000-0000-0000-000000000000"
-project_name    = "portfolio"
-environment     = "dev"
-location        = "eastus"
+project_name = "portfolio"
+domain_name  = "timfletcher.tech"
 
-# Custom domain via Cloudflare
-domain_name          = "timfletcher.tech"
-cloudflare_zone_id   = "your-zone-id"
-cloudflare_api_token = "your-scoped-api-token"
-
-# Budget alert (the email stays in your git-ignored terraform.tfvars)
-budget_alert_email = "you@example.com"
+cloudflare_account_id = "your-account-id"
+cloudflare_zone_id    = "your-zone-id"
+cloudflare_api_token  = "your-scoped-api-token"

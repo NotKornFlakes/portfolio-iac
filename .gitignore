@@ -11,3 +11,6 @@ override.tf.json
 *_override.tf.json
 .terraformrc
 terraform.rc
+
+# Local R2 credentials for the state backend
+*.env

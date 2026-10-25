@@ -1,39 +1,40 @@
 terraform {
-  required_version = ">= 1.6.0"
+  # 1.10+ for S3 native state locking (use_lockfile)
+  required_version = ">= 1.10.0"
 
-  # Remote state in Azure Storage. Settings live in backend.hcl (written by
-  # scripts/bootstrap-oidc.sh): terraform init -backend-config=backend.hcl
-  backend "azurerm" {}
+  # Remote state in a Cloudflare R2 bucket through R2's S3-compatible API.
+  # Credentials and the account endpoint come from environment variables so
+  # nothing account-specific is committed:
+  #   AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY  R2 token for this bucket only
+  #   AWS_ENDPOINT_URL_S3                        https://<account_id>.r2.cloudflarestorage.com
+  backend "s3" {
+    bucket = "timfletcher-tfstate"
+    key    = "portfolio.tfstate"
+    region = "auto"
+
+    # R2 isn't AWS: skip the AWS-only checks and use path-style URLs
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    skip_requesting_account_id  = true
+    skip_s3_checksum            = true
+    use_path_style              = true
+
+    # Lock with a .tflock object. R2 evaluates If-None-Match on writes
+    # atomically, so two runs can't hold the lock at once.
+    use_lockfile = true
+  }
 
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6"
-    }
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "~> 4.52"
+      version = "~> 5.27"
     }
   }
 }
 
-provider "azurerm" {
-  features {}
-  subscription_id = var.subscription_id
-
-  # GitHub Actions only has rights on this project's resource group, not the
-  # whole subscription, so skip subscription-wide provider registration.
-  resource_provider_registrations = "none"
-
-  # Upload and read blobs with Entra ID (RBAC) instead of storage account keys
-  storage_use_azuread = true
-}
-
-# Scoped API token (DNS, Zone Settings, Cloud Connector on this one zone only)
+# Scoped API token: Workers Scripts on the account, plus DNS, Zone Settings
+# and Transform Rules on this one zone
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }

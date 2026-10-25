@@ -1,92 +1,44 @@
-# Random suffix so the storage account name is globally unique
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 locals {
-  name_prefix          = "${var.project_name}-${var.environment}"
-  storage_account_name = "st${var.project_name}${var.environment}${random_string.suffix.result}"
-  site_dir             = "${path.module}/site"
+  site_dir  = "${path.module}/site"
+  hostnames = toset([var.domain_name, "www.${var.domain_name}"])
 }
 
-resource "azurerm_resource_group" "main" {
-  name     = "rg-${local.name_prefix}"
-  location = var.location
-  tags     = var.tags
-}
+# The site is a Worker with static assets and no script. Cloudflare serves
+# every file in ./site from its edge with the right content type. The
+# provider hashes the directory at plan time, so any changed file shows up in
+# terraform plan and is uploaded on apply.
+resource "cloudflare_workers_script" "site" {
+  account_id         = var.cloudflare_account_id
+  script_name        = var.project_name
+  compatibility_date = "2026-10-01"
 
-resource "azurerm_storage_account" "site" {
-  # Security scan exceptions, each one a deliberate trade-off for a public static website:
-  #checkov:skip=CKV_AZURE_59:Static website hosting requires public network access
-  #checkov:skip=CKV2_AZURE_33:Private endpoints would block public visitors to the site
-  #checkov:skip=CKV_AZURE_206:LRS is enough for a dev site whose source of truth is this repo
-  #checkov:skip=CKV2_AZURE_1:No sensitive data; Microsoft-managed encryption keys are sufficient
-  #checkov:skip=CKV_AZURE_33:Queue service is not used by this project
-  name                     = local.storage_account_name
-  resource_group_name      = azurerm_resource_group.main.name
-  location                 = azurerm_resource_group.main.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  account_kind             = "StorageV2"
-
-  min_tls_version                 = "TLS1_2"
-  https_traffic_only_enabled      = true
-  allow_nested_items_to_be_public = false
-  local_user_enabled              = false
-  shared_access_key_enabled       = false
-
-  # Recover accidentally deleted or overwritten files for 7 days
-  blob_properties {
-    delete_retention_policy {
-      days = 7
-    }
-    container_delete_retention_policy {
-      days = 7
+  assets = {
+    directory = local.site_dir
+    config = {
+      # /about.html is served at /about; unknown paths get 404.html with a 404
+      html_handling      = "auto-trailing-slash"
+      not_found_handling = "404-page"
     }
   }
-
-  # Any SAS token issued for this account expires after 1 day
-  sas_policy {
-    expiration_period = "01.00:00:00"
-    expiration_action = "Log"
-  }
-
-  tags = var.tags
 }
 
-# Turns on static website hosting (creates the special $web container)
-resource "azurerm_storage_account_static_website" "site" {
-  storage_account_id = azurerm_storage_account.site.id
-  index_document     = "index.html"
-  error_404_document = "404.html"
+# Serve the Worker on the apex and www. Cloudflare creates the DNS records and
+# the TLS certificate for each hostname itself, so there are no CNAMEs here.
+resource "cloudflare_workers_custom_domain" "site" {
+  for_each = local.hostnames
+
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+  hostname   = each.value
+  service    = cloudflare_workers_script.site.script_name
 }
 
-# Upload every file in ./site to the $web container
-resource "azurerm_storage_blob" "site_files" {
-  for_each = fileset(local.site_dir, "**")
-
-  name                 = each.value
-  storage_container_id = "${azurerm_storage_account.site.id}/blobServices/default/containers/$web"
-  type                 = "Block"
-  source               = "${local.site_dir}/${each.value}"
-  content_md5          = filemd5("${local.site_dir}/${each.value}")
-  content_type = lookup(
-    {
-      html = "text/html"
-      css  = "text/css"
-      js   = "application/javascript"
-      png  = "image/png"
-      jpg  = "image/jpeg"
-      svg  = "image/svg+xml"
-      ico  = "image/x-icon"
-      pdf  = "application/pdf"
-      txt  = "text/plain"
-    },
-    reverse(split(".", each.value))[0],
-    "application/octet-stream"
-  )
-
-  depends_on = [azurerm_storage_account_static_website.site]
+# Turn off the public *.workers.dev URL and preview URLs. Without this the
+# site would also be reachable outside the zone, skipping its security
+# headers and TLS settings.
+resource "cloudflare_workers_script_subdomain" "site" {
+  account_id       = var.cloudflare_account_id
+  script_name      = cloudflare_workers_script.site.script_name
+  enabled          = false
+  previews_enabled = false
 }

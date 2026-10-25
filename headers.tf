@@ -1,6 +1,6 @@
-# Security headers. Azure Storage static websites can't set custom response
-# headers, so Cloudflare adds them at the edge with a Transform Rule.
-# HSTS and X-Content-Type-Options are set in dns.tf (zone settings).
+# Security headers. Cloudflare adds them at the edge with a Transform Rule,
+# so they apply to every response on the zone, whatever serves it.
+# HSTS and X-Content-Type-Options are set in tls.tf (zone settings).
 
 locals {
   # The site has no JavaScript, so scripts are blocked entirely. Styles only
@@ -25,58 +25,49 @@ resource "cloudflare_ruleset" "security_headers" {
   kind        = "zone"
   phase       = "http_response_headers_transform"
 
-  rules {
-    description = "Security headers on every response"
-    enabled     = true
-    expression  = "true"
-    action      = "rewrite"
+  rules = [
+    {
+      description = "Security headers on every response"
+      enabled     = true
+      expression  = "true"
+      action      = "rewrite"
 
-    # Keep headers in alphabetical order by name: Cloudflare returns them
-    # sorted, and the provider reports an error if the order differs.
-    action_parameters {
-      # Turn off browser features the site never uses
-      headers {
-        name      = "Permissions-Policy"
-        operation = "set"
-        value     = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+      action_parameters = {
+        headers = {
+          # Turn off browser features the site never uses
+          "Permissions-Policy" = {
+            operation = "set"
+            value     = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+          }
+          # Send only the origin, never full URLs, to other sites
+          "Referrer-Policy" = {
+            operation = "set"
+            value     = "strict-origin-when-cross-origin"
+          }
+          # Nobody can embed the site in a frame (clickjacking)
+          "X-Frame-Options" = {
+            operation = "set"
+            value     = "DENY"
+          }
+        }
       }
-      # Send only the origin, never full URLs, to other sites
-      headers {
-        name      = "Referrer-Policy"
-        operation = "set"
-        value     = "strict-origin-when-cross-origin"
-      }
-      # Nobody can embed the site in a frame (clickjacking)
-      headers {
-        name      = "X-Frame-Options"
-        operation = "set"
-        value     = "DENY"
-      }
-    }
-  }
+    },
+    # Skipped for PDFs: a strict policy can stop the browser's built-in PDF
+    # viewer from rendering resume.pdf.
+    {
+      description = "Content-Security-Policy on HTML pages"
+      enabled     = true
+      expression  = "not (http.request.uri.path contains \".pdf\")"
+      action      = "rewrite"
 
-  # Skipped for PDFs: a strict policy can stop the browser's built-in PDF
-  # viewer from rendering resume.pdf.
-  rules {
-    description = "Content-Security-Policy on HTML pages"
-    enabled     = true
-    expression  = "not (http.request.uri.path contains \".pdf\")"
-    action      = "rewrite"
-
-    action_parameters {
-      headers {
-        name      = "Content-Security-Policy"
-        operation = "set"
-        value     = local.content_security_policy
+      action_parameters = {
+        headers = {
+          "Content-Security-Policy" = {
+            operation = "set"
+            value     = local.content_security_policy
+          }
+        }
       }
-    }
-  }
-}
-
-# DNSSEC signs DNS answers so resolvers can detect forged records. Cloudflare
-# is also the registrar, so it publishes the DS record at the .tech registry.
-# Never remove this resource while the DS record exists, or the domain stops
-# resolving; disable DNSSEC in the dashboard first and wait for the DS to clear.
-resource "cloudflare_zone_dnssec" "site" {
-  zone_id = var.cloudflare_zone_id
+    },
+  ]
 }
