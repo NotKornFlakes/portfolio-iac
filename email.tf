@@ -3,9 +3,9 @@
 # can't be used for phishing or spoofing.
 
 # Null MX (RFC 7505): this domain accepts no mail
-resource "cloudflare_record" "null_mx" {
+resource "cloudflare_dns_record" "null_mx" {
   zone_id  = var.cloudflare_zone_id
-  name     = "@"
+  name     = var.domain_name
   type     = "MX"
   content  = "."
   priority = 0
@@ -14,9 +14,9 @@ resource "cloudflare_record" "null_mx" {
 }
 
 # SPF: no server is allowed to send mail as this domain
-resource "cloudflare_record" "spf" {
+resource "cloudflare_dns_record" "spf" {
   zone_id = var.cloudflare_zone_id
-  name    = "@"
+  name    = var.domain_name
   type    = "TXT"
   content = "v=spf1 -all"
   ttl     = 1
@@ -24,9 +24,9 @@ resource "cloudflare_record" "spf" {
 }
 
 # DMARC: reject anything that fails SPF/DKIM, including subdomains
-resource "cloudflare_record" "dmarc" {
+resource "cloudflare_dns_record" "dmarc" {
   zone_id = var.cloudflare_zone_id
-  name    = "_dmarc"
+  name    = "_dmarc.${var.domain_name}"
   type    = "TXT"
   content = "v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s"
   ttl     = 1
@@ -34,9 +34,9 @@ resource "cloudflare_record" "dmarc" {
 }
 
 # Empty DKIM key: no signature from this domain is ever valid
-resource "cloudflare_record" "dkim_null" {
+resource "cloudflare_dns_record" "dkim_null" {
   zone_id = var.cloudflare_zone_id
-  name    = "*._domainkey"
+  name    = "*._domainkey.${var.domain_name}"
   type    = "TXT"
   content = "v=DKIM1; p="
   ttl     = 1

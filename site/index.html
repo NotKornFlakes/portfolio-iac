@@ -118,14 +118,14 @@
 
       <article class="card">
         <div class="kicker">Infrastructure as Code</div>
-        <h3>This Website: Azure + Terraform</h3>
-        <p>The page you're reading is hosted on Azure Storage and deployed entirely with Terraform.</p>
+        <h3>This Website: Cloudflare + Terraform</h3>
+        <p>The page you're reading is served from Cloudflare's edge by Workers static assets and deployed entirely with Terraform.</p>
         <ul>
-          <li>Storage account hardened with TLS 1.2+, HTTPS only, no anonymous blob access and soft delete.</li>
+          <li>No origin server; security headers, HSTS, DNSSEC and email anti-spoofing records are all managed in code.</li>
           <li>GitHub Actions runs fmt, validate and a <b>Checkov security scan</b> on every push, and fails on any unaddressed finding.</li>
-          <li>Each accepted risk is documented in code with a written justification.</li>
+          <li>Started on Azure Storage, then moved to Cloudflare by importing the live config into new Terraform state.</li>
         </ul>
-        <div class="stack"><span>Terraform</span><span>Azure Storage</span><span>GitHub Actions</span><span>Checkov</span></div>
+        <div class="stack"><span>Terraform</span><span>Cloudflare Workers</span><span>R2</span><span>GitHub Actions</span><span>Checkov</span></div>
         <div class="links"><a href="https://github.com/NotKornFlakes/azure-portfolio-iac" target="_blank" rel="noopener">→ GitHub</a></div>
       </article>
 
@@ -253,7 +253,7 @@
 <footer>
   <div class="wrap">
     <span>© 2026 Timothy Fletcher</span>
-    <span>Deployed by GitHub Actions + Terraform via <code>OIDC</code> · <a href="https://github.com/NotKornFlakes/azure-portfolio-iac" target="_blank" rel="noopener">view source</a></span>
+    <span>Deployed by GitHub Actions + Terraform on <code>Cloudflare Workers</code> ·<a href="https://github.com/NotKornFlakes/azure-portfolio-iac" target="_blank" rel="noopener">view source</a></span>
   </div>
 </footer>
 

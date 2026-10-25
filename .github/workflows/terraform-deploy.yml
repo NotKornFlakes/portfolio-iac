@@ -7,7 +7,6 @@ on:
     branches: [main]
     paths:
       - "**.tf"
-      - "backend.hcl"
       - ".terraform.lock.hcl"
       - "site/**"
       - ".github/workflows/terraform-deploy.yml"
@@ -15,7 +14,6 @@ on:
     branches: [main]
     paths:
       - "**.tf"
-      - "backend.hcl"
       - ".terraform.lock.hcl"
       - "site/**"
       - ".github/workflows/terraform-deploy.yml"
@@ -23,7 +21,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write # lets the job request an OIDC token to sign in to Azure
 
 # Never run two Terraform jobs at once
 concurrency:
@@ -31,15 +28,14 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Azure sign-in through OIDC. No client secret exists anywhere.
-  ARM_USE_OIDC: "true"
-  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  # Terraform state in Cloudflare R2. The R2 token can only read and write
+  # objects in the state bucket.
+  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  AWS_ENDPOINT_URL_S3: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+  TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
   TF_VAR_cloudflare_zone_id: ${{ secrets.CLOUDFLARE_ZONE_ID }}
   TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-  TF_VAR_budget_alert_email: ${{ secrets.BUDGET_ALERT_EMAIL }}
   TF_IN_AUTOMATION: "true"
   TF_INPUT: "false"
 
@@ -53,7 +49,7 @@ jobs:
       - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
 
       - name: Init
-        run: terraform init -backend-config=backend.hcl
+        run: terraform init
 
       - name: Plan
         run: terraform plan -lock-timeout=5m
@@ -68,19 +64,9 @@ jobs:
       - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
 
       - name: Init
-        run: terraform init -backend-config=backend.hcl
+        run: terraform init
 
+      # No cache purge step: each deploy uploads a new asset manifest, and
+      # Workers serves the new files right away.
       - name: Apply
         run: terraform apply -auto-approve -lock-timeout=5m
-
-      # Cloudflare caches the site at its edge, so clear it after every deploy
-      # or visitors keep seeing the old files. Needs Zone > Cache Purge on the token.
-      - name: Purge Cloudflare cache
-        run: |
-          curl --fail-with-body --silent --show-error -X POST \
-            "https://api.cloudflare.com/client/v4/zones/${TF_VAR_cloudflare_zone_id}/purge_cache" \
-            -H "Authorization: Bearer ${TF_VAR_cloudflare_api_token}" \
-            -H "Content-Type: application/json" \
-            --data '{"purge_everything":true}' \
-            | jq -e '.success' > /dev/null
-          echo "Cloudflare cache purged"

@@ -1,99 +1,91 @@
-# Azure Portfolio Site — Infrastructure as Code
+# Portfolio Site on Cloudflare — Infrastructure as Code
 
 ![Terraform CI](https://github.com/NotKornFlakes/azure-portfolio-iac/actions/workflows/terraform-ci.yml/badge.svg)
 ![Terraform Deploy](https://github.com/NotKornFlakes/azure-portfolio-iac/actions/workflows/terraform-deploy.yml/badge.svg)
 
-A static portfolio website hosted on **Azure Storage** behind **Cloudflare**, provisioned entirely with **Terraform** (two providers: `azurerm` and `cloudflare`) and deployed by **GitHub Actions** through **OIDC**: no passwords or keys for Azure are stored anywhere.
+A static portfolio website served by **Cloudflare Workers static assets**, provisioned entirely with **Terraform** (`cloudflare` provider) and deployed by **GitHub Actions**. Terraform state lives in **Cloudflare R2**. There is no origin server.
 
 **Live site:** https://timfletcher.tech
 
 ## Architecture
 
 ```
- Browser ──HTTPS──▶ Cloudflare ──HTTPS──▶ Azure Storage Account
- (timfletcher.tech)  • TLS certificate    (Static Website, $web container)
-                     • HTTP → HTTPS             ▲
-                     • CDN cache                │
-                     • Host header rewrite      │ terraform apply
-                                                │ (azurerm + cloudflare providers)
- Developer ──git push──▶ GitHub Actions ────────┘
+ Browser ──HTTPS──▶ Cloudflare edge (timfletcher.tech, www)
+                     • TLS certificate, HTTP → HTTPS, HSTS
+                     • Transform Rule: CSP and other security headers
+                     • Worker static assets: the files in site/
+                                   ▲
+                                   │ terraform apply (cloudflare provider)
+ Developer ──git push──▶ GitHub Actions
                          • CI: fmt → validate → Checkov scan
                          • PR: terraform plan
                          • main: terraform apply (production environment)
-                                 │ OIDC sign-in, no stored secret
-                                 ▼
-                         Entra ID app ──▶ Terraform state in Azure Storage
-                                          (Entra ID auth only, versioned, locked)
+                                   │
+                                   ▼
+                         Terraform state in Cloudflare R2
+                         (bucket-scoped token, lock file)
 ```
 
-**Why Cloudflare?** Azure Storage can't serve HTTPS on a custom domain by itself, can't map an apex domain (`timfletcher.tech` without `www`), and only answers requests addressed to its own web endpoint. Cloudflare provides the certificate, flattens the apex CNAME, and a Cloud Connector rule rewrites the Host header so Azure accepts the traffic. Azure Front Door does the same job but costs about $35/month; this setup is free apart from the domain.
+**Why Workers?** The site first ran on Azure Storage behind Cloudflare (see [History](#history)). That needed a Cloud Connector rule to rewrite the Host header, and the Azure endpoint stayed reachable directly, skipping Cloudflare's security headers. Workers static assets serve the files from Cloudflare's edge, so there's no origin to rewrite to or bypass, and one Terraform provider manages everything. Requests to static assets are free and unlimited, and no Worker code runs.
 
 | Resource | Purpose |
 |---|---|
-| `azurerm_resource_group` | Container for all project resources |
-| `azurerm_storage_account` | StorageV2, LRS, TLS 1.2+, HTTPS only, account keys disabled, 7-day soft delete, SAS expiry policy |
-| `azurerm_storage_account_static_website` | Enables static site hosting |
-| `azurerm_storage_blob` | Uploads every file in `site/` with the right content type; `content_md5` re-uploads a file whenever its contents change |
-| `azurerm_consumption_budget_resource_group` | $5/month budget on the site's resource group; emails an alert at 85% of actual spend |
-| `cloudflare_record` (apex + www) | Proxied CNAMEs pointing the custom domain at the Azure web endpoint |
-| `cloudflare_record` (MX, SPF, DMARC, DKIM) | Null MX, `v=spf1 -all`, DMARC `p=reject` and an empty DKIM key, so nobody can send email pretending to be this domain |
-| `cloudflare_cloud_connector_rules` | Rewrites the Host header so Azure Storage serves the custom domain |
-| `cloudflare_zone_settings_override` | Full (strict) TLS to the origin, always HTTPS, TLS 1.2 minimum, HSTS (1 year), `nosniff` |
+| `cloudflare_workers_script` | A Worker with static assets and no code. Uploads every file in `site/`; the provider hashes the folder at plan time, so any changed file shows up in `terraform plan`. Unknown paths get `404.html` with a 404 status |
+| `cloudflare_workers_custom_domain` (apex + www) | Routes both hostnames to the Worker; Cloudflare creates their DNS records and TLS certificate |
+| `cloudflare_workers_script_subdomain` | Turns off the `*.workers.dev` URL and preview URLs, so the site is only reachable through the zone and its security settings |
+| `cloudflare_dns_record` (MX, SPF, DMARC, DKIM) | Null MX, `v=spf1 -all`, DMARC `p=reject` and an empty DKIM key, so nobody can send email pretending to be this domain |
+| `cloudflare_zone_setting` (×5) | Full (strict) TLS, always HTTPS, TLS 1.2 minimum, automatic HTTPS rewrites, HSTS (1 year) with `nosniff` |
 | `cloudflare_ruleset` (response headers) | Content-Security-Policy, `X-Frame-Options: DENY`, Referrer-Policy and Permissions-Policy on every response |
-| `cloudflare_zone_dnssec` | Signs DNS answers so forged records are detected |
+| `cloudflare_zone_dnssec` | Signs DNS answers so forged records are detected; `prevent_destroy` stops Terraform from turning it off while the registry still has the DS record |
+
+The email, TLS, header and DNSSEC resources existed before state moved to R2, so [`imports.tf`](imports.tf) adopts them with `import` blocks instead of recreating them. Once a resource is in state its import block does nothing, so the blocks stay as a record of the IDs and can rebuild the state if it's ever lost.
 
 ## CI/CD
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `terraform-ci.yml` | Every push and PR | `fmt`, `validate`, Checkov scan; fails on any unaddressed finding |
+| `terraform-ci.yml` | Every push and PR | `fmt`, `validate`, Checkov scan of the Terraform and the workflows; fails on any unaddressed finding |
 | `terraform-deploy.yml` | Pull request | `terraform plan`, a preview of what would change |
-| `terraform-deploy.yml` | Merge to `main` | `terraform apply` in the `production` environment, then purges the Cloudflare cache so visitors get the new files immediately |
+| `terraform-deploy.yml` | Merge to `main` | `terraform apply` in the `production` environment |
 
-**How GitHub signs in to Azure:** GitHub issues a short-lived OIDC token for each run, and Entra ID exchanges it for an Azure token. The Entra ID app only trusts two subjects: pull requests and the `production` environment of this repo, identified by GitHub's immutable owner and repo IDs, so a renamed or recreated repo can't impersonate it. There is no client secret to leak or rotate.
+There's no cache purge step: each deploy uploads a new asset manifest, and Workers serves the new files right away.
 
-**Least privilege:** the deploy identity has **Contributor on the site's resource group only** (not the subscription) and **Storage Blob Data Contributor on the state account only**. A concurrency group stops two Terraform runs from overlapping, and the state blob is locked during each run.
+**Credentials:** the pipeline uses two Cloudflare tokens, both stored as GitHub Actions secrets:
 
-**Terraform state** lives in a separate storage account created by [`scripts/bootstrap-oidc.sh`](scripts/bootstrap-oidc.sh): shared keys disabled (Entra ID auth only), TLS 1.2+, no public access, blob versioning and 30-day soft delete so any state version can be recovered.
+- An **API token** for Terraform: **Account → Workers Scripts → Edit**, plus **DNS**, **Zone Settings** and **Transform Rules** edit rights on this one zone.
+- An **R2 token** for the state: **Object Read & Write** on the state bucket only. It can't read or touch any other bucket.
+
+A concurrency group stops two Terraform runs from overlapping, and the state is locked during each run with a `.tflock` object. R2 checks `If-None-Match` on writes atomically, so only one run can create the lock.
+
+**Terraform state** lives in the R2 bucket `timfletcher-tfstate`, never in the repo. The account endpoint and R2 keys come from environment variables (`AWS_ENDPOINT_URL_S3`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`), so nothing account-specific is committed.
 
 ## Security scanning
 
-Every push runs [Checkov](https://www.checkov.io/), and the pipeline **fails** on any unaddressed finding.
+Every push runs [Checkov](https://www.checkov.io/) on the Terraform and the GitHub Actions workflows, and the pipeline **fails** on any unaddressed finding. Checkov has no Cloudflare policies yet, so today the workflow checks do most of the work: no write-all permissions, no shell injection, no secrets passed to `curl`.
 
 **Hardening applied:**
-- **Azure:** TLS 1.2 minimum, HTTPS only, no anonymous blob access, local users disabled, 7-day soft delete for blobs and containers, 1-day SAS token expiry policy.
-- **No storage account keys:** Shared Key access is disabled on both storage accounts. Terraform uploads site files with Entra ID (`storage_use_azuread = true`) using the **Storage Blob Data Contributor** role, so there's no account key that could leak or need rotating.
-- **Cloudflare:** Full (strict) SSL, so Cloudflare validates Azure's certificate; automatic HTTP → HTTPS redirects; TLS 1.2 minimum.
-- **Security headers:** Azure static sites can't send custom headers, so a Cloudflare Transform Rule adds them. The Content-Security-Policy blocks all scripts (the site has none) and all inline styles (CSS lives in `site/styles.css`), blocks framing, and only allows fonts from Google Fonts. Graded **A+** by securityheaders.com, Mozilla HTTP Observatory (115/100) and SSL Labs. HSTS keeps browsers on HTTPS.
+- **No origin server:** the files are served from Cloudflare's edge, and the `workers.dev` and preview URLs are off, so every request goes through the zone's TLS settings and security headers.
+- **Cloudflare TLS:** Full (strict) SSL, automatic HTTP → HTTPS redirects, TLS 1.2 minimum.
+- **Security headers:** a Cloudflare Transform Rule adds them to every response. The Content-Security-Policy blocks all scripts (the site has none) and all inline styles (CSS lives in `site/styles.css`), blocks framing, and only allows fonts from Google Fonts. Graded **A+** by securityheaders.com, Mozilla HTTP Observatory (115/100) and SSL Labs. HSTS keeps browsers on HTTPS.
 - **Vulnerability disclosure:** [`/.well-known/security.txt`](https://timfletcher.tech/.well-known/security.txt) (RFC 9116) points researchers to GitHub private vulnerability reporting, so reports reach me without publishing an email address.
 - **DNSSEC:** DNS answers are signed, so resolvers can detect forged records for the domain.
 - **Email anti-spoofing:** the domain sends no email, and its DNS says so (null MX, SPF `-all`, DMARC `p=reject`, empty DKIM), so mail servers reject phishing that claims to come from it.
-- **Least-privilege credentials:** the Cloudflare API token is scoped to one zone with only DNS, Zone Settings, Cloud Connector and Cache Purge rights. The GitHub Actions token is read-only (`permissions: contents: read`).
-- **No secrets in Git:** locally, the subscription ID and API token live only in the git-ignored `terraform.tfvars`; in CI they're GitHub Actions secrets, masked in public logs. Terraform state lives in Azure, never in the repo.
-- **No stored Azure credentials:** GitHub Actions signs in with OIDC federation, so there's no client secret anywhere.
+- **Least-privilege credentials:** the API token can only edit Workers scripts on the account and DNS, zone settings and transform rules on one zone. The R2 token only reaches the state bucket. The GitHub Actions token is read-only (`permissions: contents: read`).
+- **No secrets in Git:** locally, the account ID, zone ID and API token live only in the git-ignored `terraform.tfvars`; in CI they're GitHub Actions secrets, masked in public logs.
 
-**Supply chain:** every GitHub Action is pinned to a full commit hash instead of a version tag, so a compromised or moved tag can't change what runs in the pipeline. Dependabot opens a weekly PR when a new version is released.
+**Supply chain:** every GitHub Action is pinned to a full commit hash instead of a version tag, so a compromised or moved tag can't change what runs in the pipeline. Dependabot opens a weekly PR when a new version is released. The Cloudflare provider is pinned in `.terraform.lock.hcl` with its checksums.
 
-**Accepted risks:** some checks don't fit a public website. Each one is suppressed in `main.tf` with a written reason:
+**Accepted risk – long-lived Cloudflare tokens.** The Azure version signed in through OIDC, so no Azure secret existed anywhere. The Cloudflare API token and R2 token are stored secrets instead. They're scoped as narrowly as Cloudflare allows, `apply` only runs after approval in the `production` environment, and both tokens should have an expiry date so they get rotated.
 
-| Check | Why it's skipped |
-|---|---|
-| CKV_AZURE_59 – disallow public access | A public website has to be reachable from the internet |
-| CKV2_AZURE_33 – private endpoint | Would block public visitors |
-| CKV_AZURE_206 – geo-replication | Dev site; the repo is the source of truth, so LRS keeps cost minimal |
-| CKV2_AZURE_1 – customer-managed keys | No sensitive data; Microsoft-managed keys are sufficient |
-| CKV_AZURE_33 – queue logging | Queue service isn't used |
+**Accepted risk – no state history.** R2 doesn't support object versioning, so unlike the old Azure state account, earlier versions of the state can't be restored. The state holds no long-lived secrets, and the `import` blocks plus `terraform plan` can rebuild it from the live resources.
 
-**Accepted risk outside Checkov – the Azure endpoint bypasses Cloudflare.** The site is also reachable directly at its Azure web endpoint (`*.z13.web.core.windows.net`), which skips Cloudflare's cache, headers and DDoS protection. Restricting the storage firewall to Cloudflare's IP ranges would also block GitHub Actions from uploading files, because the Azure data plane would reject the runners' IPs. The risk is low: the endpoint only serves the same public static files, has no secrets or write access, and the $5 budget alert catches any unusual bandwidth cost. A future fix is moving uploads to a self-hosted runner or Azure Front Door with Private Link.
-
-**Accepted risk outside Checkov – legacy TLS 1.2 cipher suites at the edge.** Cloudflare's Free plan offers some older CBC-mode TLS 1.2 ciphers for compatibility, which internet.nl flags as "phase out" (SSL Labs still grades A+, and modern browsers negotiate TLS 1.3). Choosing cipher suites requires Cloudflare's paid Advanced Certificate Manager, and requiring TLS 1.3 only would block some older corporate proxies, so recruiters on locked-down networks might not reach the site. Revisit if the site ever handles logins or personal data.
+**Accepted risk – legacy TLS 1.2 cipher suites at the edge.** Cloudflare's Free plan offers some older CBC-mode TLS 1.2 ciphers for compatibility, which internet.nl flags as "phase out" (SSL Labs still grades A+, and modern browsers negotiate TLS 1.3). Choosing cipher suites requires Cloudflare's paid Advanced Certificate Manager, and requiring TLS 1.3 only would block some older corporate proxies, so recruiters on locked-down networks might not reach the site. Revisit if the site ever handles logins or personal data.
 
 ## Prerequisites
 
-- An Azure account (free tier works)
-- [Terraform](https://developer.hashicorp.com/terraform/install) 1.6+
-- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)
-- A domain added to Cloudflare (Free plan), plus a Cloudflare API token scoped to that zone with **Zone → DNS → Edit**, **Zone → Zone Settings → Edit**, **Zone → Cloud Connector → Edit**, **Zone → Cache Purge → Purge** and **Zone → Transform Rules → Edit**
+- A Cloudflare account with the domain added as a zone (Free plan) and R2 enabled
+- [Terraform](https://developer.hashicorp.com/terraform/install) 1.10+
+- A Cloudflare API token with **Account → Workers Scripts → Edit**, **Zone → DNS → Edit**, **Zone → Zone Settings → Edit** and **Zone → Transform Rules → Edit**, limited to this account and zone
 
 ## Deploy
 
@@ -101,24 +93,40 @@ Every push runs [Checkov](https://www.checkov.io/), and the pipeline **fails** o
 
 **One-time setup:**
 
-```bash
-az login
-./scripts/bootstrap-oidc.sh                     # state storage, Entra ID app, roles, backend.hcl
-cp terraform.tfvars.example terraform.tfvars    # for local runs: subscription ID, zone ID, API token
-terraform init -backend-config=backend.hcl
-```
+1. In the Cloudflare dashboard, create the R2 bucket `timfletcher-tfstate`. Then, under **R2 → Manage API tokens**, create a token with **Object Read & Write** applied to that bucket only, and note its Access Key ID and Secret Access Key.
+2. Create the API token from the prerequisites. Give both tokens an expiry date.
+3. Run Terraform locally:
 
-Then add these repository secrets in GitHub (**Settings → Secrets and variables → Actions**): `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_API_TOKEN`, `BUDGET_ALERT_EMAIL`. Also create an environment named `production`.
+   ```bash
+   cp terraform.tfvars.example terraform.tfvars   # account ID, zone ID, API token
+   cat > r2.env << 'EOF'                          # git-ignored, like terraform.tfvars
+   export AWS_ACCESS_KEY_ID=...                   # R2 token
+   export AWS_SECRET_ACCESS_KEY=...
+   export AWS_ENDPOINT_URL_S3=https://<account-id>.r2.cloudflarestorage.com
+   EOF
+   source r2.env
+   terraform init
+   terraform plan
+   ```
 
-Terraform prints `custom_domain_url` (the Cloudflare address) and `website_url` (the raw Azure endpoint) after each apply.
+4. Add these repository secrets in GitHub (**Settings → Secrets and variables → Actions**): `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_API_TOKEN`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`. Also create an environment named `production`.
 
 ## Tear down
+
+DNSSEC is protected by `prevent_destroy`, so `terraform destroy` refuses to run while it's managed. Disable DNSSEC in the Cloudflare dashboard first and wait for the DS record to clear at the registry. Then remove the `lifecycle` block in `dns.tf` and run:
 
 ```bash
 terraform destroy
 ```
 
+## History
+
+- **Azure + Cloudflare (October 2026).** The first version served `site/` from an Azure Storage static website behind Cloudflare. A Cloud Connector rule rewrote the Host header, GitHub Actions signed in to Azure through OIDC with no client secret, blob uploads used Entra ID auth with storage account keys disabled, Terraform state lived in a versioned Azure Storage account, and a $5/month Azure budget alerted on spend.
+- **Cloudflare only (October 2026).** Hosting moved to Workers static assets and Terraform state moved to R2, on version 5 of the Cloudflare provider. The email, DNSSEC, TLS and security-header configuration was imported into the new state rather than recreated. All Azure resources and the OIDC bootstrap script were removed.
+
 ## What I learned
+
+The site first ran on Azure Storage behind Cloudflare (see [History](#history)), so most of these lessons come from building and running that version.
 
 ### Building it
 
@@ -150,9 +158,7 @@ terraform destroy
 - [x] Security scanning with enforced Checkov policy
 - [x] Custom domain with HTTPS via Cloudflare (managed in Terraform)
 - [x] Read-only GitHub Actions token
-- [x] Remote state in an Azure Storage backend
-- [x] Deploy from GitHub Actions using OIDC (no stored secrets)
-- [x] Blob uploads with Entra ID auth; Shared Key disabled
-- [x] Azure budget alert managed in Terraform
+- [x] Azure version: remote state in Azure Storage, OIDC deploys, Entra ID blob uploads, budget alert
 - [x] Security review fixes: email anti-spoofing, security headers (A+), DNSSEC, pinned actions, branch protection
-- [ ] Visitor counter (Azure Functions + Cosmos DB)
+- [x] Move hosting to Workers static assets and state to R2; remove Azure
+- [ ] Visitor counter (Workers + D1)
