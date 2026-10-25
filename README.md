@@ -48,7 +48,7 @@ The email, TLS, header and DNSSEC resources existed before state moved to R2, so
 | `terraform-deploy.yml` | Pull request | `terraform plan`, a preview of what would change |
 | `terraform-deploy.yml` | Merge to `main` | `terraform apply` in the `production` environment |
 
-There's no cache purge step: each deploy uploads a new asset manifest, and Workers serves the new files right away.
+There's no cache purge step: each deploy uploads a new asset manifest, and Workers serves the new files without one. I tested this from outside: a file Cloudflare had cached was replaced on the first request after `terraform apply` finished.
 
 **Credentials:** the pipeline uses two Cloudflare tokens, both stored as GitHub Actions secrets:
 
