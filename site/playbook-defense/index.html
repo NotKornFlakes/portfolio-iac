@@ -18,11 +18,11 @@
   <div class="wrap">
     <a class="brand" href="/">tim<span>@</span>fletcher:~$</a>
     <ul>
-      <li><a href="/#projects">Projects</a></li>
-      <li><a href="/#experience">Experience</a></li>
-      <li><a href="/#skills">Skills</a></li>
+      <li><a href="/#help">Services</a></li>
+      <li><a href="/#how-i-build">How I work</a></li>
+      <li><a href="/#about">About</a></li>
+      <li><a href="/portfolio/">Portfolio</a></li>
       <li><a href="/#writing">Writing</a></li>
-      <li><a href="/work-with-me/">Work with me</a></li>
       <li><a href="/#contact">Contact</a></li>
     </ul>
   </div>
@@ -31,7 +31,7 @@
 <main class="wrap" id="top">
 
   <header class="hero project">
-    <div class="back"><a href="/#projects">← All projects</a></div>
+    <div class="back"><a href="/">← Home</a><a href="/portfolio/#projects">← All projects</a></div>
     <div class="prompt">$ cd ~/projects/playbook-defense</div>
     <h1>Playbook Defense</h1>
     <p class="role"><strong>Honeypot findings, turned into alerts, an allowlist and a trap</strong> · Sigma and Terraform on Google Cloud · Nov 2026</p>
@@ -64,8 +64,8 @@
     <div class="sec-head"><span class="idx">01</span><h2>In short</h2></div>
     <ul class="prose">
       <li><b>Where it starts:</b> the <a href="/honeypot/">Rust telnet honeypot</a> recorded 839 bot logins and the steps they took afterwards, from default passwords to malware downloads. Its report ends with what defenders should do. This project does it.</li>
-      <li><b>What I built:</b> 17 Sigma alert rules, one or more for every step of that playbook; Google Cloud firewall rules in Terraform that only let approved addresses reach admin ports and only let IoT devices reach the servers they need; and an internal decoy NAS, running the honeypot's own fake shell, that no real person or system ever uses.</li>
-      <li><b>Why it holds together:</b> a single file, <code>allowlist.yaml</code>, lists who is allowed in, where IoT devices may go and where the decoy lives. Terraform builds the firewall from it, and a script writes the same addresses into the alert rules, so the firewall and the alerts can't drift apart.</li>
+      <li><b>What I built:</b> 17 Sigma alert rules, one or more for every step of that playbook; Google Cloud firewall rules in Terraform that only let approved addresses reach admin ports and only let IoT devices reach the servers they need; and an internal decoy NAS, running the honeypot's own fake shell, that no real person or system is meant to use.</li>
+      <li><b>Why it holds together:</b> a single file, <code>allowlist.yaml</code>, lists who is allowed in, where IoT devices may go and where the decoy lives. Terraform builds the firewall from it, and a script writes the same addresses into the alert rules, so both come from one list.</li>
     </ul>
   </section>
 
@@ -149,10 +149,10 @@
       <figcaption>The numbers match the list below. Every arrow that crosses a firewall writes a log entry, and those log entries are what the alerts read.</figcaption>
     </figure>
     <ol class="prose">
-      <li><b>Bots stop at the edge.</b> Admin ports (SSH, RDP, VNC and device web pages) only answer the VPN, static office addresses and Google's Identity-Aware Proxy. Telnet, the door every bot on the honeypot came through, is closed to everyone by default, the allowlist included.</li>
+      <li><b>Designed to stop bots at the edge.</b> Admin ports (SSH, RDP, VNC and device web pages) only answer the VPN, static office addresses and Google's Identity-Aware Proxy. Telnet, the door every bot on the honeypot came through, is closed to everyone by default, the allowlist included.</li>
       <li><b>Approved people still get in.</b> One door, preferably the VPN. Losing a laptop means revoking one VPN account, not editing the firewall.</li>
-      <li><b>IoT devices can't call out.</b> Every dropper the honeypot saw fetched its payload from a raw IP address on the internet. IoT devices may only reach the few servers they need, so that download fails, and the blocked attempt is an alert.</li>
-      <li><b>Anything that touches the decoy is an alert.</b> The NAS decoy sits inside the network with an ordinary server name. Nothing legitimate uses it, so a connection means someone inside is exploring: a compromised device, a bot past the edge, or a person who shouldn't be there.</li>
+      <li><b>IoT devices are blocked from calling out.</b> Every dropper the honeypot saw fetched its payload from a raw IP address on the internet. IoT devices may only reach the few servers they need, so that download would fail, and the blocked attempt would raise an alert.</li>
+      <li><b>Anything that touches the decoy is an alert.</b> The NAS decoy sits inside the network with an ordinary server name. No real person or system is meant to use it, so a connection most likely means someone inside is exploring: a compromised device, a bot past the edge, or a person who shouldn't be there.</li>
     </ol>
   </section>
 
@@ -177,13 +177,13 @@
           <tr><td>Download and run</td><td><a href="https://attack.mitre.org/techniques/T1105/" target="_blank" rel="noopener">T1105</a>, <a href="https://attack.mitre.org/techniques/T1222/002/" target="_blank" rel="noopener">T1222.002</a>, <a href="https://attack.mitre.org/techniques/T1059/004/" target="_blank" rel="noopener">T1059.004</a></td><td>Download from a raw IP; IoT device calling out, critical on dropper ports</td><td>Processes, firewall</td><td><span class="lvl crit">critical</span></td></tr>
           <tr><td>Remove rival bots</td><td><a href="https://attack.mitre.org/techniques/T1489/" target="_blank" rel="noopener">T1489</a></td><td><code>kill -9</code> aimed at other malware</td><td>Processes</td><td><span class="lvl">medium</span></td></tr>
           <tr><td>Clean up</td><td><a href="https://attack.mitre.org/techniques/T1070/004/" target="_blank" rel="noopener">T1070.004</a></td><td>Dropped file or shell history deleted</td><td>Processes</td><td><span class="lvl">medium</span></td></tr>
-          <tr><td>Write a payload with hex echoes, instead of downloading</td><td><a href="https://attack.mitre.org/techniques/T1140/" target="_blank" rel="noopener">T1140</a>, <a href="https://attack.mitre.org/techniques/T1059/004/" target="_blank" rel="noopener">T1059.004</a></td><td>Long runs of hex escapes in <code>echo -ne</code> or <code>printf</code></td><td>Processes</td><td><span class="lvl">medium</span></td></tr>
+          <tr class="extra"><td>Write a payload with hex echoes, instead of downloading</td><td><a href="https://attack.mitre.org/techniques/T1140/" target="_blank" rel="noopener">T1140</a>, <a href="https://attack.mitre.org/techniques/T1059/004/" target="_blank" rel="noopener">T1059.004</a></td><td>Long runs of hex escapes in <code>echo -ne</code> or <code>printf</code></td><td>Processes</td><td><span class="lvl">medium</span></td></tr>
           <tr class="extra"><td>The whole playbook</td><td>—</td><td>Telnet from outside, then the same device calls out within 10 minutes</td><td>Firewall</td><td><span class="lvl crit">critical</span></td></tr>
           <tr class="extra"><td>The trap</td><td>—</td><td>Any connection to the decoy; a login attempt on it; the decoy trying to connect out</td><td>Firewall</td><td><span class="lvl crit">critical</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="table-note">The step names and ATT&amp;CK IDs are the same as on the <a href="/honeypot/#playbook">honeypot page</a>. The last two rows go beyond a single step. Each rule's file is in the repo's <a href="https://github.com/NotKornFlakes/playbook-defense/tree/master/rules" target="_blank" rel="noopener">rules folder</a>.</p>
+    <p class="table-note">The first 12 rows are the 12 steps on the <a href="/honeypot/#playbook">honeypot page</a>, with the same names and ATT&amp;CK IDs. The last three go further: a payload written with hex echoes instead of downloaded, seen in one honeypot session; the whole playbook; and the trap. Each rule's file is in the repo's <a href="https://github.com/NotKornFlakes/playbook-defense/tree/master/rules" target="_blank" rel="noopener">rules folder</a>.</p>
   </section>
 
   <section id="trap">
@@ -191,10 +191,10 @@
     <ul class="prose">
       <li><b>It's the honeypot, moved inside.</b> The decoy runs the same Rust fake shell, with the same safety design: every reply is fixed text, and nothing a visitor sends is ever run. What changes is where it sits and what it's called. It has no public IP, an ordinary NAS hostname, and a bland network tag.</li>
       <li><b>Twelve NAS ports, one that answers.</b> Only telnet answers, with the fake shell. FTP, SMB, AFP, NFS, rsync and the usual NAS admin pages have nothing behind them, but the cloud firewall still logs every attempt to reach them, and that's all an alert needs.</li>
-      <li><b>It can't become a foothold.</b> The decoy can't start a connection: outbound traffic is denied by the cloud firewall and again by nftables on the host. If it ever tries, that's its own critical alert, and the answer is to shut it down.</li>
+      <li><b>It's built so it can't become a foothold.</b> The decoy can't start a connection: outbound traffic is denied by the cloud firewall and again by nftables on the host. If it ever tries, that's its own critical alert, and the answer is to shut it down.</li>
     </ul>
     <div class="callout">
-      <p><b>Why this is worth having.</b> The allowlist and the IoT rules stop bots at the door. The decoy catches what got past it. Because nothing legitimate ever connects to it, its alerts have almost no false positives, which is rare for detection inside a network. The one exception is an approved vulnerability scanner, and the allowlist file has a place to exclude those.</p>
+      <p><b>Why this is worth having.</b> The allowlist and the IoT rules are designed to stop bots at the door, and the decoy is there to catch what gets past them. Because nothing legitimate should connect to it, its alerts should have few false positives, which is rare for detection inside a network. The one exception is an approved vulnerability scanner, and the allowlist file has a place to exclude those.</p>
     </div>
   </section>
 

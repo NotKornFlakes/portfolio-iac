@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Portfolio · Timothy Fletcher</title>
+<meta name="description" content="Personal and lab projects by Timothy Fletcher: a Rust telnet honeypot, Sigma detection rules, Azure honeypots with Sentinel, SOAR automation, this website's Terraform setup and an HHS breach analysis.">
+<link rel="canonical" href="https://timfletcher.tech/portfolio/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/inter-4.001-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-2.211-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="/">tim<span>@</span>fletcher:~$</a>
+    <ul>
+      <li><a href="/#help">Services</a></li>
+      <li><a href="/#how-i-build">How I work</a></li>
+      <li><a href="/#about">About</a></li>
+      <li><a href="/portfolio/" aria-current="page">Portfolio</a></li>
+      <li><a href="/#writing">Writing</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="wrap" id="top">
+
+  <header class="hero project">
+    <div class="back"><a href="/">← Home</a></div>
+    <div class="prompt">$ ls ~/projects</div>
+    <h1>Portfolio</h1>
+    <p class="summary">
+      These are personal and lab projects I built on my own time, not client work. Each one links to its
+      code and write-up, so you can check the numbers yourself.
+    </p>
+  </header>
+
+  <div class="metrics" aria-label="Project highlights">
+    <div class="metric"><div class="num">1.24M</div><div class="lbl">attack attempts on my Azure honeypots in about 37 hours (75 IPs)</div></div>
+    <div class="metric"><div class="num">0</div><div class="lbl">outbound connections from my Rust honeypot across 839 bot logins: the sensor stayed contained</div></div>
+    <div class="metric"><div class="num">17</div><div class="lbl">open-source Sigma rules, with one or more for each of the 12 playbook steps</div></div>
+    <div class="metric"><div class="num">65→6</div><div class="lbl">alerts grouped into incidents by attacker IP, on the SOAR lab's first night</div></div>
+  </div>
+
+  <section id="projects">
+    <div class="sec-head"><span class="idx">01</span><h2>Projects</h2></div>
+    <div class="projects">
+
+      <article class="card" id="honeypot">
+        <div class="kicker">Deception &amp; Threat Research</div>
+        <h3>Rust Telnet Honeypot: What IoT Botnets Do After Login</h3>
+        <p>A telnet honeypot in Rust on Google Cloud. Its fake shell records what bots do after they log in, and it's built to run nothing they send.</p>
+        <ul>
+          <li>Recorded <b>5,527 connections from 790 IPs</b> in 186 hours (Nov 3–10, 2026). 839 logins sent 3,784 commands, including 23 malware download attempts.</li>
+          <li><b>0 outbound connections</b> from the sensor in that window, in both the host and cloud firewall logs: it stayed contained.</li>
+          <li>Mapped the post-login playbook to <b>MITRE ATT&amp;CK</b>: router-menu escapes, BusyBox checks, writable-folder probes and droppers for several CPU types.</li>
+          <li>Reported <b>170 attacking IPs</b> to AbuseIPDB. At least <b>316 of the 330</b> IPs that got into the shell (96%) had been reported before they arrived.</li>
+          <li>Layered so each safeguard still holds if the one before it fails: fixed replies compiled into the program, a noexec systemd sandbox, and outbound traffic denied at both the host and cloud firewalls.</li>
+        </ul>
+        <p class="shows"><b>What this shows I can do for you:</b> build something that's safe to leave running on its own, and report what it found in plain numbers.</p>
+        <div class="stack"><span>Rust</span><span>Google Cloud</span><span>Terraform</span><span>nftables</span><span>MITRE ATT&amp;CK</span><span>Plotly</span></div>
+        <div class="links"><a href="/honeypot/">→ Project page</a><a href="https://github.com/NotKornFlakes/rust-telnet-sensor" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+      <article class="card" id="playbook-defense">
+        <div class="kicker">Detection Rules</div>
+        <h3>Playbook Defense: Honeypot Findings as Alerts, Allowlist and Trap</h3>
+        <p>17 Sigma rules mapped to each step of the IoT botnet playbook, a Google Cloud firewall allowlist in Terraform, and an internal NAS decoy designed so that any connection to it raises an alert.</p>
+        <ul>
+          <li>Wrote <b>17 Sigma rules</b>, with one or more for each of the 12 playbook steps. On each push, CI checks them against MITRE ATT&amp;CK, converts them to Splunk searches and validates the Terraform.</li>
+          <li>Admin ports are set to answer only allowlisted addresses, such as the VPN and Identity-Aware Proxy. Telnet is closed to everyone by default, and IoT devices may reach only approved servers. One file feeds both the firewall and the alerts, so both are built from the same list.</li>
+          <li>The NAS decoy runs the honeypot's fake shell with no public IP. No real person or system is meant to use it, so a connection to it should be a <b>high-confidence alert</b>.</li>
+          <li><b>Not deployed to a real network yet.</b> The rules have been converted and the Terraform validated in CI, but neither has run against live traffic.</li>
+        </ul>
+        <p class="shows"><b>What this shows I can do for you:</b> turn findings into rules and config you can review, test and reuse, and say plainly what's been tested and what hasn't.</p>
+        <div class="stack"><span>Sigma</span><span>Terraform</span><span>Google Cloud</span><span>GitHub Actions</span><span>Deception</span></div>
+        <div class="links"><a href="/playbook-defense/">→ Project page</a><a href="https://github.com/NotKornFlakes/playbook-defense" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+      <article class="card" id="soc-home-lab">
+        <div class="kicker">Detection &amp; Response</div>
+        <h3>SOC Home Lab: Azure Honeypots + Sentinel</h3>
+        <p>Three internet-facing honeypots feeding Microsoft Sentinel, used to write and test detections against real attack traffic.</p>
+        <ul>
+          <li>Deployed Windows RDP, Cowrie SSH and Endlessh honeypots with Azure Monitor Agent and custom log tables. Captured <b>1.24M attempts from 75 IPs in about 37 hours</b>, and no attacker logged in to a real system.</li>
+          <li>Three IPs made 95% of the attempts, all of them on RDP.</li>
+          <li>Wrote 5 KQL analytics rules (password spray, brute-force-then-success) and rebuilt the low-and-slow rule after v1 missed an attacker guessing once every 12 minutes.</li>
+          <li>Reconstructed an SSH intrusion chain, mapped <b>13 ATT&amp;CK techniques</b>, and identified Panchan, Mirai and Bashlite samples by hash.</li>
+        </ul>
+        <p class="shows"><b>What this shows I can do for you:</b> set up logging and alerts, then fix them when they miss something.</p>
+        <div class="stack"><span>Sentinel</span><span>KQL</span><span>Azure Monitor</span><span>Cowrie</span><span>MITRE ATT&amp;CK</span><span>D3</span></div>
+        <div class="links"><a href="https://github.com/NotKornFlakes/SocHomelab" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+      <article class="card" id="sentinel-soar">
+        <div class="kicker">SOAR Automation</div>
+        <h3>Sentinel SOAR: Automated Brute-Force Response</h3>
+        <p>A Logic App playbook that looks up Sentinel incidents in a threat-intel feed and blocks high-risk IPs automatically.</p>
+        <ul>
+          <li>Connected Sentinel, the AbuseIPDB API and the Azure REST API, running under a least-privilege managed identity.</li>
+          <li>Automated triage took <b>about 12 seconds</b> on average (8–18 s), against an estimated manual triage time of 10–15 minutes. The 3 IPs it blocked made no further attempts during the ~62-hour test.</li>
+          <li>Grouping by attacker IP turned <b>65 alerts into 6 incidents</b> on the first night.</li>
+          <li>Ran in October 2026. All resources were deleted after the test.</li>
+        </ul>
+        <p class="shows"><b>What this shows I can do for you:</b> connect the tools you already use so routine steps happen on their own, with only the access they need.</p>
+        <div class="stack"><span>Logic Apps</span><span>AbuseIPDB</span><span>Azure REST API</span><span>NSG</span><span>Managed Identity</span></div>
+        <div class="links"><a href="https://github.com/NotKornFlakes/Sentinel-SOAR-Lab" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+      <article class="card" id="this-website">
+        <div class="kicker">Hardening &amp; Change Control</div>
+        <h3>This Website: Cloudflare + Terraform</h3>
+        <p>The page you're reading is served from Cloudflare's edge, with no separate origin server to bypass, and it's deployed entirely from code.</p>
+        <ul>
+          <li>Changes go through a pull request, a reviewed Terraform plan and an approval gate. A GitHub ruleset blocks direct pushes to <code>main</code>, admins included.</li>
+          <li><b>21 automated checks</b> verify the live headers, HTTPS, DNSSEC and email records after each deploy, and a weekly run flags drift from the code.</li>
+          <li>Email anti-spoofing (SPF, DKIM, DMARC reject), DNSSEC and a CSP that allows no third parties. Graded <b>A+</b> by SSL Labs (checked Nov 14, 2026).</li>
+        </ul>
+        <p class="shows"><b>What this shows I can do for you:</b> set up email anti-spoofing, security headers and a review step before changes go live, then check them from the outside.</p>
+        <div class="stack"><span>Terraform</span><span>Cloudflare</span><span>GitHub Actions</span><span>Checkov</span><span>zizmor</span></div>
+        <div class="links"><a href="https://github.com/NotKornFlakes/portfolio-iac" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+      <article class="card" id="hhs-breach-analysis">
+        <div class="kicker">Data Analysis</div>
+        <h3>HHS Healthcare Breach Analysis</h3>
+        <p>An analysis of the 8,013 healthcare breaches affecting 500 or more people that were reported to HHS OCR, turned into guidance for a small clinic.</p>
+        <ul>
+          <li>Cleaned and analyzed <b>8,013 breach records</b> (Oct 2009 – Sep 2026) with Python and pandas.</li>
+          <li>Showed that hacking was involved in <b>81% of breaches</b> in 2025, up from 4% in 2010, and published an interactive Plotly dashboard.</li>
+          <li>Wrote a security-budget memo for a fictional 40-person clinic, as a practice exercise (not client work).</li>
+        </ul>
+        <p class="shows"><b>What this shows I can do for you:</b> clean up messy data and turn it into a clear dashboard and a short, plain recommendation.</p>
+        <div class="stack"><span>Python</span><span>pandas</span><span>Plotly</span><span>Jupyter</span></div>
+        <div class="links"><a href="https://github.com/NotKornFlakes/hhs-breach-analysis" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="sec-head"><span class="idx">02</span><h2>Experience</h2></div>
+    <div class="timeline">
+      <div class="job">
+        <div class="job-head">
+          <h3>Help Desk Analyst <span class="org">· Upstate Medical University</span></h3>
+          <span class="when">Oct 2025 – Present</span>
+        </div>
+        <p>Tier 1 support by phone and ticket for clinical and administrative staff. I manage Active Directory and Microsoft 365 accounts and access under least privilege, work my own ticket queue to service-level targets, and escalate with clear handoff notes.</p>
+      </div>
+      <div class="job past">
+        <div class="job-head">
+          <h3>Owner <span class="org">· Self-Employed Home Repair &amp; Remodeling</span></h3>
+          <span class="when">Jan 2021 – Sep 2025</span>
+        </div>
+        <p>Ran client communication, scheduling and on-site diagnosis end to end, alongside full-time study for my B.A. in Information Science (graduated Dec 2024).</p>
+      </div>
+      <div class="job past">
+        <div class="job-head">
+          <h3>Project Estimator / Coordinator <span class="org">· TPM General Contractors</span></h3>
+          <span class="when">Jan 2019 – Jan 2021</span>
+        </div>
+        <p>Built insurance claim estimates in Xactimate and tracked schedules across contractors and clients.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="sec-head"><span class="idx">03</span><h2>Skills</h2></div>
+    <div class="skills">
+      <div class="skill-group">
+        <h3>// Build with</h3>
+        <ul class="chips">
+          <li>Claude</li><li>Git and GitHub</li><li>GitHub Actions</li><li>Terraform</li><li>Python</li><li>Rust</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h3>// Security and detection</h3>
+        <ul class="chips">
+          <li>Sigma</li><li>KQL</li><li>Microsoft Sentinel</li><li>Logic Apps (SOAR)</li><li>MITRE ATT&amp;CK</li>
+          <li>Honeypots (Cowrie, Endlessh, my own in Rust)</li><li>AbuseIPDB</li><li>Checkov</li><li>zizmor</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h3>// Cloud and systems</h3>
+        <ul class="chips">
+          <li>Cloudflare (Workers, DNS, DNSSEC)</li><li>Google Cloud</li><li>Azure (VMs, NSG rules, managed identity)</li>
+          <li>Linux (Fedora, Ubuntu)</li><li>nftables</li><li>Email authentication (SPF, DKIM, DMARC)</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h3>// Data</h3>
+        <ul class="chips">
+          <li>pandas</li><li>Plotly</li><li>Jupyter</li><li>D3 (SocHomelab dashboard)</li><li>REST APIs</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h3>// Day job</h3>
+        <ul class="chips">
+          <li>Active Directory</li><li>Microsoft 365 / Outlook</li><li>Windows</li><li>Ticket queues</li><li>Escalation and handoff</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h3>// Familiar</h3>
+        <ul class="chips">
+          <li>SQL</li><li>Excel</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="certs">
+    <div class="sec-head"><span class="idx">04</span><h2>Certifications &amp; Education</h2></div>
+    <div class="certs">
+      <div class="cert">
+        <div class="k">Certification · Jul 2025</div>
+        <h3>ISC2 Certified in Cybersecurity (CC)</h3>
+        <p>Security principles, access control, network security and incident response.</p>
+      </div>
+      <div class="cert">
+        <div class="k">Certification</div>
+        <h3>TestOut Security Pro</h3>
+        <p>Hands-on, performance-based security lab certification.</p>
+      </div>
+      <div class="cert">
+        <div class="k">Education · Dec 2024</div>
+        <h3>B.A. Information Science</h3>
+        <p>SUNY Oswego. Coursework in cybersecurity, networking, systems analysis and databases. Ongoing TryHackMe labs.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="more">
+    <div class="contact">
+      <h2>Have a project in mind?</h2>
+      <p>Email me with your questions.</p>
+      <div class="buttons">
+        <a class="btn primary" href="mailto:workwithtim@proton.me?subject=Work%20with%20me">Email me</a>
+        <a class="btn" href="/">← Home</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Timothy Fletcher</span>
+    <span>Deployed by GitHub Actions + Terraform on <code>Cloudflare Workers</code> · <a href="https://github.com/NotKornFlakes/portfolio-iac" target="_blank" rel="noopener">view source</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
