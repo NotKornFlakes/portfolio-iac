@@ -267,3 +267,9 @@ header.hero.project { padding: 48px 0 32px; }
 .lvl.high { color: var(--accent-2); }
 .lvl.crit { color: var(--warn); font-weight: 600; }
 .table-note { font-size: 13.5px; color: var(--muted); margin: 0 0 40px; max-width: 720px; }
+
+/* Work with me page: offer cards reuse .card. */
+.offer .stack span { white-space: nowrap; }
+ol.prose { padding-left: 22px; }
+nav ul a[aria-current="page"] { color: var(--text); }
+@media (max-width: 860px) { nav ul { gap: 14px; } }
