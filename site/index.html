@@ -33,7 +33,7 @@
   <header class="hero">
     <div class="prompt">$ whoami <span class="cursor" aria-hidden="true"></span></div>
     <h1>Timothy Fletcher</h1>
-    <p class="role"><strong>Detection engineering</strong> · Linux · Open source · Defense on a budget</p>
+    <p class="role"><strong>Security operations</strong> · Linux · Open source · Defense on a budget</p>
     <p class="summary">
       I'm learning how small companies can protect themselves from attackers without expensive
       subscriptions, using Linux and free, community-built open-source tools. My goal is simple
@@ -96,7 +96,7 @@
       </article>
 
       <article class="card">
-        <div class="kicker">Detection Engineering</div>
+        <div class="kicker">Detection Rules</div>
         <h3>Playbook Defense: Honeypot Findings as Alerts, Allowlist and Trap</h3>
         <p>17 Sigma rules mapped to each step of the IoT botnet playbook (MITRE ATT&amp;CK), a GCP firewall allowlist in Terraform, and an internal NAS decoy where any connection is an alert.</p>
         <ul>
@@ -104,7 +104,7 @@
           <li>Admin ports answer only allowlisted addresses such as the VPN and Identity-Aware Proxy, telnet is denied to everyone by default, and IoT devices can reach only approved servers. One file feeds both the firewall and the alerts, so they never disagree.</li>
           <li>The NAS decoy runs the honeypot's fake shell with no public IP. Nothing legitimate touches it, so any connection is a <b>high-confidence alert</b>.</li>
         </ul>
-        <div class="stack"><span>Sigma</span><span>Terraform</span><span>GCP</span><span>Detection Engineering</span><span>Deception</span></div>
+        <div class="stack"><span>Sigma</span><span>Terraform</span><span>GCP</span><span>Alerting</span><span>Deception</span></div>
         <div class="links"><a href="/playbook-defense/">→ Project page</a><a href="https://github.com/NotKornFlakes/playbook-defense" target="_blank" rel="noopener">→ GitHub</a></div>
       </article>
 
