@@ -103,7 +103,7 @@
         <p>A Logic App playbook that looks up Sentinel incidents in a threat-intel feed and blocks high-risk IPs automatically.</p>
         <ul>
           <li>Connected Sentinel, the AbuseIPDB API and the Azure REST API, running under a least-privilege managed identity.</li>
-          <li>Automated triage took <b>about 12 seconds</b> on average (8–18 s), against an estimated manual triage time of 10–15 minutes. The 3 IPs it blocked made no further attempts during the ~62-hour test.</li>
+          <li>Automated triage took <b>about 12 seconds</b> on average (8–18 s), against an estimated manual triage time of 10–15 minutes. No further attempts from the 3 blocked IPs reached the VM during the ~62-hour test.</li>
           <li>Grouping by attacker IP turned <b>65 alerts into 6 incidents</b> on the first night.</li>
           <li>Ran in October 2026. All resources were deleted after the test.</li>
         </ul>
