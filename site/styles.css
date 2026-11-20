@@ -209,6 +209,9 @@ h2 { font-size: 26px; margin: 0; letter-spacing: -0.01em; }
   padding: 32px; text-align: center;
 }
 .contact h2 { margin-bottom: 8px; }
+/* On the home page the box sits under a numbered "Contact" heading, so its
+   headline is an h3 at a size between the section heading and body text. */
+.contact h3 { font-size: 22px; line-height: 1.25; letter-spacing: -0.01em; margin: 0 0 8px; }
 .contact p { color: var(--muted); margin: 0 auto 20px; max-width: 520px; }
 .contact .buttons { justify-content: center; }
 footer { border-top: 1px solid var(--line); padding: 28px 0 40px; margin-top: 8px; }
