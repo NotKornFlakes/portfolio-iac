@@ -4,9 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark light">
-<title>Timothy Fletcher · Automations, Small Tools and Security Basics</title>
-<meta name="description" content="Automations, small custom tools and security basics for small businesses, grassroots groups and nonprofits, built with Claude, tested by me and handed over as code you own.">
+<title>Timothy Fletcher · SOC Analyst &amp; Remote IT Support</title>
+<meta name="description" content="Timothy Fletcher, SOC analyst and remote IT support in Syracuse, NY. ISC2 CC. Detection, automation and security basics, with labs and write-ups on GitHub.">
 <link rel="canonical" href="https://timfletcher.tech/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Timothy Fletcher">
+<meta property="og:title" content="Timothy Fletcher · SOC Analyst &amp; Remote IT Support">
+<meta property="og:description" content="Timothy Fletcher, SOC analyst and remote IT support in Syracuse, NY. ISC2 CC. Detection, automation and security basics, with labs and write-ups on GitHub.">
+<meta property="og:url" content="https://timfletcher.tech/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<!-- TODO: add a 1200×630 PNG in site/ and an og:image tag for it, so LinkedIn and Slack link previews show a picture. -->
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/inter-4.001-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/jetbrains-mono-2.211-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -18,11 +26,11 @@
   <div class="wrap">
     <a class="brand" href="#top">tim<span>@</span>fletcher:~$</a>
     <ul>
-      <li><a href="#help">Services</a></li>
-      <li><a href="#how-i-build">How I build</a></li>
       <li><a href="#about">About</a></li>
-      <li><a href="/portfolio/">Portfolio</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
       <li><a href="#writing">Writing</a></li>
+      <li><a href="#how-i-work">How I work</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </div>
@@ -33,135 +41,168 @@
   <header class="hero home">
     <div class="prompt">$ whoami <span class="cursor" aria-hidden="true"></span></div>
     <p class="hero-name">Timothy Fletcher</p>
-    <p class="byline">Syracuse, NY · available remotely</p>
-    <h1>Automations, small tools and security basics for small businesses, nonprofits and grassroots groups.</h1>
+    <p class="byline">SOC analyst &amp; remote IT support · Syracuse, NY · ISC2 CC</p>
+    <h1>I automate the tedious stuff and lock down the basics.</h1>
     <p class="summary">
-      I build with Claude, test everything myself, and hand over code you own, with a plain-English guide to how it works.
+      Right now I'm on the help desk at Upstate Medical University, supporting hospital staff. On my own time
+      I build security labs, detections and automations, and write up what I find.
     </p>
     <div class="buttons">
-      <a class="btn primary" href="mailto:workwithtim@proton.me?subject=Work%20with%20me">Email me</a>
-      <a class="btn" href="/portfolio/">See my work</a>
+      <a class="btn primary" href="/resume.pdf" target="_blank" rel="noopener">Résumé</a>
+      <a class="btn" href="#contact">Contact</a>
     </div>
   </header>
 
-  <section id="help">
-    <div class="sec-head"><span class="idx">01</span><h2>What I can help with</h2></div>
-    <div class="projects offers">
-
-      <article class="card offer">
-        <div class="kicker">Automation</div>
-        <h3>Automate the repetitive stuff</h3>
-        <p><b>For:</b> teams doing the same tasks by hand in the apps they already use.</p>
-        <ul>
-          <li>Form answers sent straight to a spreadsheet, a CRM or the right person's inbox.</li>
-          <li>Reminders for invoices, renewals or follow-ups that send themselves.</li>
-          <li>Weekly summaries built and emailed automatically.</li>
-        </ul>
-        <p class="shows"><b>You get:</b> a workflow that runs on its own and alerts someone if it fails, so nothing breaks quietly.</p>
-        <div class="stack"><span>Python</span><span>REST APIs</span><span>Logic Apps</span><span>GitHub Actions</span></div>
-        <div class="links"><a href="/portfolio/#sentinel-soar">See an example: Sentinel SOAR →</a></div>
-      </article>
-
-      <article class="card offer">
-        <div class="kicker">Custom tools</div>
-        <h3>Small tools built for you</h3>
-        <p><b>For:</b> teams with a job off-the-shelf software doesn't quite fit.</p>
-        <ul>
-          <li>Cleaning up and combining messy spreadsheets or exports.</li>
-          <li>Dashboards that turn your data into a clear picture.</li>
-          <li>Scripts that run on a schedule and report back.</li>
-        </ul>
-        <p class="shows"><b>You get:</b> a Python script or simple dashboard built for that one job.</p>
-        <div class="stack"><span>Python</span><span>pandas</span><span>Plotly</span><span>Git</span></div>
-        <div class="links"><a href="/portfolio/#hhs-breach-analysis">See an example: HHS breach analysis →</a></div>
-      </article>
-
-      <article class="card offer">
-        <div class="kicker">Security basics</div>
-        <h3>A check-up for sign-ins, email and backups</h3>
-        <p><b>For:</b> small teams that want someone to check the basics.</p>
-        <ul>
-          <li>Microsoft 365 sign-in settings, admin accounts and old accounts that should be closed.</li>
-          <li>Email anti-spoofing records (SPF, DKIM, DMARC), so mail servers can reject email pretending to be you.</li>
-          <li>Backups: do they run, and could you actually restore from them?</li>
-        </ul>
-        <p class="shows"><b>You get:</b> a short, plain-English list of what to fix first and why.</p>
-        <div class="stack"><span>Microsoft 365</span><span>DNS and email records</span><span>Read-only access</span><span>Plain-English notes</span></div>
-        <div class="links"><a href="/portfolio/#this-website">See an example: this website's setup →</a></div>
-      </article>
-
-      <article class="card offer">
-        <div class="kicker">Free</div>
-        <h3>Open-source code and guides</h3>
-        <p><b>For:</b> anyone who'd rather do it themselves.</p>
-        <ul>
-          <li>Detection rules, firewall configs and deployment code on <a href="https://github.com/NotKornFlakes" target="_blank" rel="noopener">GitHub</a>.</li>
-          <li>Plain-language write-ups on <a href="https://medium.com/@no1listeninghere" target="_blank" rel="noopener">Medium</a>.</li>
-        </ul>
-        <p class="shows"><b>You get:</b> what I build and learn, for free. Security fixes are never kept behind a paywall.</p>
-        <div class="stack"><span>Open source</span><span>GitHub</span><span>Medium</span></div>
-        <div class="links"><a href="/portfolio/#playbook-defense">See an example: Playbook Defense →</a></div>
-      </article>
-
-    </div>
-    <p class="aside">Not sure which of these fits? Tell me what you're working on.</p>
-  </section>
-
-  <section id="how-i-build">
-    <div class="sec-head"><span class="idx">02</span><h2>How I build</h2></div>
-    <div class="prose">
-      <p>
-        I use Claude, Anthropic's AI assistant, to build faster. Then I read, test and document everything
-        myself before I hand it over.
-      </p>
-    </div>
-    <ul class="prose">
-      <li><b>Secure by default.</b> Each automation gets the least access it needs. Passwords and keys aren't stored in plain text, and data isn't kept longer than the job needs.</li>
-      <li><b>Reliable.</b> I test with real examples, and anything that runs on its own tells someone when it fails.</li>
-      <li><b>Yours to keep.</b> The code, accounts and tools stay in your name, and everything is documented, so you aren't locked into me.</li>
-      <li><b>Permission in writing.</b> I don't touch a system without written agreement on what's allowed.</li>
-      <li><b>No kickbacks.</b> I don't earn commissions on tools I recommend. Free and open-source comes first.</li>
-      <li><b>Separate from my day job.</b> This is independent work, done on my own time and equipment.</li>
-    </ul>
-    <div class="callout">
-      <p><b>What I take on, and what I don't.</b> I'm open to new projects now: small, well-scoped work, like one workflow, one tool or one check-up. I'm not a 24/7 IT provider, a penetration-testing firm or a compliance auditor. If you need one of those, I'll help you find someone who can.</p>
-    </div>
-  </section>
-
-  <section id="process">
-    <div class="sec-head"><span class="idx">03</span><h2>How it works</h2></div>
-    <ol class="prose">
-      <li><b>Email me</b> with a sentence or two about what you need.</li>
-      <li><b>I reply</b> with questions or an honest answer. If an existing tool already does the job, I'll tell you.</li>
-      <li><b>A call, only if we need one:</b> a Proton Meet video call or a regular phone call, whichever you prefer.</li>
-      <li><b>A written plan</b> before any work starts: what I'll build, what access it needs, and what you'll get.</li>
-      <li><b>Build, test and hand over</b>, in a GitHub repository you own, with a short guide on how it works and what to do if it stops.</li>
-    </ol>
-  </section>
-
   <section id="about">
-    <div class="sec-head"><span class="idx">04</span><h2>About me</h2></div>
+    <div class="sec-head"><span class="idx">01</span><h2>About me</h2></div>
     <div class="prose">
       <p>
-        I'm Tim. I'm a Help Desk Analyst at Upstate Medical University, where I support hospital and office
-        staff with accounts, access and everyday IT problems. Before that, I spent nearly five years running my
-        own home repair business, so I know a small business wants things that just work. I graduated with a
-        B.A. in Information Science from SUNY Oswego in December 2024 and hold the ISC2 Certified in
-        Cybersecurity (CC) certification. In my own time I ship real projects on GitHub.
+        I'm Tim, a Help Desk Analyst at Upstate Medical University. I support hospital and office staff by
+        phone and ticket: Active Directory and Microsoft 365 accounts and access, set up under least privilege,
+        and the everyday problems that stop people working. I work my own queue to service-level targets and
+        escalate with clear handoff notes.
+      </p>
+      <p>
+        Before IT, I ran my own home repair business for nearly five years. I was the whole company: I talked
+        customers through what was wrong, scoped the work and owned each job until it was done. I still work
+        that way: clear communication, an honest scope and following through.
+      </p>
+      <p>
+        I graduated from SUNY Oswego in December 2024 with a B.A. in Information Science, studying full time
+        while running the business, and I hold the ISC2 Certified in Cybersecurity (CC) certification.
       </p>
     </div>
-    <!-- The ids keep old links (/#projects, /#experience, /#skills) working: they land here, next to links to those sections on the portfolio page. -->
+    <!-- id="experience" keeps old /#experience links working: they land next to a link to that section on the portfolio page. -->
     <div class="more">
-      <a id="projects" href="/portfolio/#projects">→ Projects</a>
       <a id="experience" href="/portfolio/#experience">→ Experience</a>
-      <a id="skills" href="/portfolio/#skills">→ Skills</a>
       <a href="/resume.pdf" target="_blank" rel="noopener">→ Résumé (PDF)</a>
     </div>
   </section>
 
+  <section id="skills">
+    <!-- id="help" keeps old /#help links (the services section) working: they land on Skills. The services now live on /services/. -->
+    <div class="sec-head" id="help"><span class="idx">02</span><h2>Skills</h2></div>
+    <div class="projects">
+
+      <article class="card skill-card">
+        <div class="kicker">Automation</div>
+        <h3>I automate repetitive work</h3>
+        <p>I build automations with Python, GitHub Actions, Logic Apps and REST APIs, so routine steps run on their own and tell someone when they fail.</p>
+        <ul>
+          <li>A Logic App that looks up brute-force attackers in a threat-intel feed and blocks high-risk IPs about 12 seconds after the incident opens.</li>
+          <li>A <a href="https://github.com/NotKornFlakes/playbook-defense/blob/master/scripts/apply_allowlist.py" target="_blank" rel="noopener">Python script</a> that copies the firewall allowlist into the alert rules, so the two always match. GitHub Actions runs it, and the rule tests, on every push.</li>
+          <li>GitHub Actions pipelines that scan, plan and deploy this site, then check the live result from outside.</li>
+        </ul>
+        <div class="stack"><span>Python</span><span>GitHub Actions</span><span>Logic Apps</span><span>REST APIs</span></div>
+        <div class="links"><a href="/portfolio/#sentinel-soar">See it: Sentinel SOAR →</a></div>
+      </article>
+
+      <article class="card skill-card">
+        <div class="kicker">Tools and data</div>
+        <h3>I build small tools and clean up messy data</h3>
+        <p>When off-the-shelf software doesn't fit, I write the tool: a script, a small program or a dashboard for one job.</p>
+        <ul>
+          <li>A telnet honeypot in Rust, built so nothing an attacker sends is ever run.</li>
+          <li>A Bash script that runs 21 checks on this site's live headers, HTTPS, DNSSEC and email records.</li>
+          <li>8,013 HHS breach records cleaned with pandas and turned into an interactive Plotly dashboard.</li>
+        </ul>
+        <div class="stack"><span>Python</span><span>pandas</span><span>Plotly</span><span>Rust</span><span>Bash</span></div>
+        <div class="links"><a href="/portfolio/#hhs-breach-analysis">See it: HHS breach analysis →</a></div>
+      </article>
+
+      <article class="card skill-card">
+        <div class="kicker">Security basics</div>
+        <h3>I lock down the basics</h3>
+        <p>Least-privilege access, email anti-spoofing, security headers, and alerts that catch what they're meant to.</p>
+        <ul>
+          <li>SPF, DKIM, DMARC, DNSSEC and a strict Content-Security-Policy on this site, graded A+ by SSL Labs.</li>
+          <li>KQL detections in Microsoft Sentinel and Sigma rules, mapped to MITRE ATT&amp;CK.</li>
+          <li>Every credential scoped to its job: managed identities and tokens that reach only what they need.</li>
+        </ul>
+        <div class="stack"><span>Microsoft Sentinel</span><span>KQL</span><span>Sigma</span><span>MITRE ATT&amp;CK</span><span>DNS and email records</span></div>
+        <div class="links"><a href="/portfolio/#this-website">See it: this website's setup →</a></div>
+      </article>
+
+      <article class="card skill-card">
+        <div class="kicker">IT support</div>
+        <h3>I keep people working</h3>
+        <p>My day job: Tier 1 support by phone and ticket for clinical and admin staff at a hospital.</p>
+        <ul>
+          <li>Active Directory and Microsoft 365 / Outlook accounts, access and delegation, under least privilege.</li>
+          <li>Working my own ticket queue to service-level targets, and documenting each fix.</li>
+          <li>Escalating complex cases with clear handoff notes, and flagging repeat issues for the knowledge base.</li>
+        </ul>
+        <div class="stack"><span>Active Directory</span><span>Microsoft 365</span><span>Windows</span><span>Ticketing</span></div>
+        <div class="links"><a href="/portfolio/#experience">See my experience →</a></div>
+      </article>
+
+    </div>
+    <div class="more"><a href="/portfolio/#skills">→ Full skills list</a></div>
+  </section>
+
+  <section id="projects">
+    <div class="sec-head"><span class="idx">03</span><h2>Projects</h2></div>
+    <div class="cases">
+
+      <article class="card case">
+        <div class="kicker">Detection &amp; Response</div>
+        <h3>SOC Home Lab: Azure Honeypots + Sentinel</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>I wanted to watch real attacks on internet-facing servers and practice writing alerts that catch them, without letting an attacker reach a real system.</dd>
+          <dt>What I built</dt>
+          <dd>Three honeypots in Azure (a Windows VM with RDP open, a Cowrie fake SSH shell and an Endlessh tarpit) feeding Microsoft Sentinel through Azure Monitor Agent and a custom log table. Then I wrote 5 KQL detections for what I saw, from password spraying to a brute force followed by a successful login. My own admin access was key-only, on a non-standard port, from one IP.</dd>
+          <dt>Tools</dt>
+          <dd><div class="stack"><span>Microsoft Sentinel</span><span>KQL</span><span>Azure Monitor Agent</span><span>Cowrie</span><span>Endlessh</span><span>MITRE ATT&amp;CK</span><span>D3</span></div></dd>
+          <dt>Result</dt>
+          <dd><b>1.24 million attempts from 75 IPs</b> in about 37 hours, and no attacker got into a real system. Three IPs made 95% of them. I reconstructed an SSH intrusion chain, mapped <b>13 ATT&amp;CK techniques</b> and identified Panchan, Mirai and Bashlite by file hash. The first low-and-slow rule missed an attacker guessing once every 12 minutes, so I rebuilt it.</dd>
+        </dl>
+        <div class="links"><a href="https://notkornflakes.github.io/SocHomelab/" target="_blank" rel="noopener">→ Interactive dashboard</a><a href="https://github.com/NotKornFlakes/SocHomelab" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+      <article class="card case">
+        <div class="kicker">SOAR Automation</div>
+        <h3>Sentinel SOAR: Automated Brute-Force Response</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>Brute-force alerts come in faster than anyone can triage them by hand. Looking up each attacking IP and deciding whether to block it takes an estimated 10–15 minutes.</dd>
+          <dt>What I built</dt>
+          <dd>A Logic App that runs when Sentinel opens a brute-force incident. It looks the IP up in AbuseIPDB, writes the result onto the incident and adds high-risk IPs to a firewall deny rule, using a managed identity with only the access it needs. Lower scores are tagged for a person to review.</dd>
+          <dt>Tools</dt>
+          <dd><div class="stack"><span>Microsoft Sentinel</span><span>KQL</span><span>Logic Apps</span><span>AbuseIPDB API</span><span>Azure REST API</span><span>NSG</span><span>Managed Identity</span></div></dd>
+          <dt>Result</dt>
+          <dd>High-risk IPs were blocked <b>about 12 seconds</b> after their incident opened (8–18 s across 3 incidents), and no further attempts from them reached the VM during the ~62-hour test. Grouping alerts by attacker IP turned <b>65 alerts into 6 incidents</b> on the first night. It also showed what it missed: 5 of 8 attackers scored below the blocking threshold, and one stayed under the alert threshold for about a day, so I wrote a second rule that would have caught it within two hours.</dd>
+        </dl>
+        <div class="links"><a href="https://github.com/NotKornFlakes/Sentinel-SOAR-Lab" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+      <article class="card case">
+        <div class="kicker">Deception &amp; Threat Research</div>
+        <h3>Rust Telnet Honeypot: What IoT Botnets Do After Login</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>I wanted to record what IoT botnets do after they log in, without giving them anything real to run or reach.</dd>
+          <dt>What I built</dt>
+          <dd>A telnet honeypot in Rust, run on Google Cloud for 186 hours. Common factory-default logins get into a fake shell where every reply is fixed text compiled into the program. It's contained in layers: a sandboxed systemd service, with outbound traffic denied at both the host and cloud firewalls. A follow-up project, Playbook Defense, turned the findings into 17 Sigma rules and a firewall allowlist in Terraform.</dd>
+          <dt>Tools</dt>
+          <dd><div class="stack"><span>Rust</span><span>Google Cloud</span><span>Terraform</span><span>nftables</span><span>Sigma</span><span>MITRE ATT&amp;CK</span><span>pandas</span><span>Plotly</span></div></dd>
+          <dt>Result</dt>
+          <dd><b>5,527 connections from 790 IPs</b> (Nov 3–10, 2026). 839 logins sent 3,784 commands, including 23 malware download attempts, and the sensor made <b>0 outbound connections</b>. The 17 Sigma rules cover all 12 playbook steps and are tested in CI, but haven't run against live traffic yet.</dd>
+        </dl>
+        <div class="links"><a href="/honeypot/">→ Project page</a><a href="/playbook-defense/">→ Playbook Defense</a><a href="https://github.com/NotKornFlakes/rust-telnet-sensor" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+    </div>
+    <div class="more"><a href="/portfolio/">→ All projects</a></div>
+  </section>
+
   <section id="writing">
-    <div class="sec-head"><span class="idx">05</span><h2>Writing</h2></div>
+    <div class="sec-head"><span class="idx">04</span><h2>Writing</h2></div>
     <ul class="posts">
+      <!-- TODO: check this title against Medium. It was rebuilt from the URL, so the capitalization and punctuation may differ. -->
+      <li><a href="https://medium.com/@no1listeninghere/open-door-policy-what-a-37-hour-honeypot-cost-me-vs-what-it-cost-them-428698cdf050" target="_blank" rel="noopener">
+        <span><span class="t">Open Door Policy: What a 37-Hour Honeypot Cost Me vs. What It Cost Them</span><span class="d">Three Azure honeypots, 1.24 million attack attempts in 37 hours, and what it cost each side.</span></span>
+        <span class="arrow" aria-hidden="true">↗</span></a></li>
       <li><a href="https://medium.com/@no1listeninghere/why-panic-is-powerful-confessions-from-the-help-desk-a4e94da824fd" target="_blank" rel="noopener">
         <span><span class="t">Why Panic Is Powerful: Confessions From the Help Desk</span><span class="d">How urgency is used in social engineering, seen from the support side.</span></span>
         <span class="arrow" aria-hidden="true">↗</span></a></li>
@@ -175,18 +216,41 @@
     <div class="more"><a href="https://medium.com/@no1listeninghere" target="_blank" rel="noopener">→ All posts on Medium</a></div>
   </section>
 
+  <section id="how-i-work">
+    <!-- id="how-i-build" and id="process" keep old /#how-i-build and /#process links working: they land on How I work. -->
+    <div class="sec-head" id="how-i-build"><span class="idx">05</span><h2 id="process">How I work</h2></div>
+    <div class="prose">
+      <p>
+        I use Claude, Anthropic's AI assistant, to build faster. Then I read, test and document everything
+        myself before it goes live.
+      </p>
+    </div>
+    <ul class="prose">
+      <li><b>Secure by default.</b> Anything I build gets the least access it needs. Passwords and keys stay out of the code, and data isn't kept longer than the job needs.</li>
+      <li><b>Reliable.</b> I test with real examples, and anything that runs on its own tells someone when it fails.</li>
+      <li><b>Reviewed before it ships.</b> Changes go through a pull request and a reviewed plan, and I check the result from outside instead of trusting a green pipeline.</li>
+      <li><b>Documented for the next person.</b> I write down how things work and what to do when they stop, so nobody's stuck waiting on me.</li>
+      <li><b>Honest about what's tested.</b> If something has only run in a lab, I say so.</li>
+      <li><b>Clear handoffs.</b> When something's beyond me, I escalate early, with what I found and what I've already tried.</li>
+    </ul>
+  </section>
+
   <section id="contact">
+    <div class="sec-head"><span class="idx">06</span><h2>Contact</h2></div>
     <div class="contact">
-      <h2>Tell me what you need</h2>
-      <p>A sentence or two is enough to start. If it helps to talk, we can set up a call.</p>
+      <h3>Open to full-time IT and security roles</h3>
+      <p>
+        Remote or in the Syracuse, NY area. Email is the quickest way to reach me, and I'm happy to talk on a
+        Proton Meet video call or a regular phone call, whichever suits you.
+      </p>
       <div class="buttons">
-        <a class="btn primary" href="mailto:workwithtim@proton.me?subject=Work%20with%20me">Email workwithtim@proton.me</a>
+        <a class="btn primary" href="mailto:workwithtim@proton.me?subject=Job%20opportunity">Email workwithtim@proton.me</a>
         <a class="btn" href="https://www.linkedin.com/in/timcfletch" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
           LinkedIn
         </a>
       </div>
-      <p class="fine">Open to project-based, part-time or full-time work.</p>
+      <p class="fine">I also take on small, project-based work on my own time.</p>
       <p class="fine"><a href="/resume.pdf" target="_blank" rel="noopener">Résumé (PDF)</a> · <a href="https://github.com/NotKornFlakes" target="_blank" rel="noopener">GitHub</a></p>
     </div>
   </section>
@@ -195,8 +259,8 @@
 
 <footer>
   <div class="wrap">
-    <span>© 2026 Timothy Fletcher</span>
-    <span>Deployed by GitHub Actions + Terraform on <code>Cloudflare Workers</code> · <a href="https://github.com/NotKornFlakes/portfolio-iac" target="_blank" rel="noopener">view source</a></span>
+    <span>© 2026 Timothy Fletcher · <a href="/services/">Independent work</a></span>
+    <span><a href="https://github.com/NotKornFlakes/portfolio-iac" target="_blank" rel="noopener">This site: Terraform + GitHub Actions on Cloudflare Workers</a></span>
   </div>
 </footer>
 
