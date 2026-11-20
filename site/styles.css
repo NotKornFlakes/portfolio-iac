@@ -287,8 +287,8 @@ header.hero.project { padding: 48px 0 32px; }
 .lvl.crit { color: var(--warn); font-weight: 600; }
 .table-note { font-size: 13.5px; color: var(--muted); margin: 0 0 40px; max-width: 720px; }
 
-/* Home page: the hero leads with who I help, so the headline is a sentence
-   and runs smaller than a name would. */
+/* Home page: the headline is a sentence, so it runs smaller than a name
+   would. */
 header.hero.home h1 { font-size: clamp(30px, 4.6vw, 44px); line-height: 1.15; max-width: 820px; margin-bottom: 18px; }
 /* Name between the prompt and the headline: twice body size on wide screens,
    26px on phones so the headline (30px there) stays the largest text. */
