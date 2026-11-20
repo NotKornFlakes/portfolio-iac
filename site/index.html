@@ -131,8 +131,64 @@
     <div class="more"><a href="/portfolio/#skills">→ Full skills list</a></div>
   </section>
 
+  <section id="projects">
+    <div class="sec-head"><span class="idx">03</span><h2>Projects</h2></div>
+    <div class="cases">
+
+      <article class="card case">
+        <div class="kicker">Detection &amp; Response</div>
+        <h3>SOC Home Lab: Azure Honeypots + Sentinel</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>I wanted to watch real attacks on internet-facing servers and practise writing alerts that catch them, without letting an attacker reach a real system.</dd>
+          <dt>What I built</dt>
+          <dd>Three honeypots in Azure (a Windows VM with RDP open, a Cowrie fake SSH shell and an Endlessh tarpit) feeding Microsoft Sentinel through Azure Monitor Agent and a custom log table. Then I wrote 5 KQL detections for what I saw, from password spraying to a brute force followed by a successful login. My own admin access was key-only, on a non-standard port, from one IP.</dd>
+          <dt>Tools</dt>
+          <dd><div class="stack"><span>Microsoft Sentinel</span><span>KQL</span><span>Azure Monitor Agent</span><span>Cowrie</span><span>Endlessh</span><span>MITRE ATT&amp;CK</span><span>D3</span></div></dd>
+          <dt>Result</dt>
+          <dd><b>1.24 million attempts from 75 IPs</b> in about 37 hours, and no attacker got into a real system. Three IPs made 95% of them. I reconstructed an SSH intrusion chain, mapped <b>13 ATT&amp;CK techniques</b> and identified Panchan, Mirai and Bashlite by file hash. The first low-and-slow rule missed an attacker guessing once every 12 minutes, so I rebuilt it.</dd>
+        </dl>
+        <div class="links"><a href="https://notkornflakes.github.io/SocHomelab/" target="_blank" rel="noopener">→ Interactive dashboard</a><a href="https://github.com/NotKornFlakes/SocHomelab" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+      <article class="card case">
+        <div class="kicker">SOAR Automation</div>
+        <h3>Sentinel SOAR: Automated Brute-Force Response</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>Brute-force alerts come in faster than anyone can triage them by hand. Looking up each attacking IP and deciding whether to block it takes an estimated 10–15 minutes.</dd>
+          <dt>What I built</dt>
+          <dd>A Logic App that runs when Sentinel opens a brute-force incident. It looks the IP up in AbuseIPDB, writes the result onto the incident and adds high-risk IPs to a firewall deny rule, using a managed identity with only the access it needs. Lower scores are tagged for a person to review.</dd>
+          <dt>Tools</dt>
+          <dd><div class="stack"><span>Microsoft Sentinel</span><span>KQL</span><span>Logic Apps</span><span>AbuseIPDB API</span><span>Azure REST API</span><span>NSG</span><span>Managed Identity</span></div></dd>
+          <dt>Result</dt>
+          <dd>High-risk IPs were blocked <b>about 12 seconds</b> after their incident opened (8–18 s across 3 incidents), and no further attempts from them reached the VM during the ~62-hour test. Grouping alerts by attacker IP turned <b>65 alerts into 6 incidents</b> on the first night. It also showed what it missed: 5 of 8 attackers scored below the blocking threshold, and one stayed under the alert threshold for about a day, so I wrote a second rule that would have caught it within two hours.</dd>
+        </dl>
+        <div class="links"><a href="https://github.com/NotKornFlakes/Sentinel-SOAR-Lab" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+      <article class="card case">
+        <div class="kicker">Deception &amp; Threat Research</div>
+        <h3>Rust Telnet Honeypot: What IoT Botnets Do After Login</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>I wanted to record what IoT botnets do after they log in, without giving them anything real to run or reach.</dd>
+          <dt>What I built</dt>
+          <dd>A telnet honeypot in Rust, run on Google Cloud for 186 hours. Common factory-default logins get into a fake shell where every reply is fixed text compiled into the program. It's contained in layers: a sandboxed systemd service, with outbound traffic denied at both the host and cloud firewalls. A follow-up project, Playbook Defense, turned the findings into 17 Sigma rules and a firewall allowlist in Terraform.</dd>
+          <dt>Tools</dt>
+          <dd><div class="stack"><span>Rust</span><span>Google Cloud</span><span>Terraform</span><span>nftables</span><span>Sigma</span><span>MITRE ATT&amp;CK</span><span>pandas</span><span>Plotly</span></div></dd>
+          <dt>Result</dt>
+          <dd><b>5,527 connections from 790 IPs</b> (Nov 3–10, 2026). 839 logins sent 3,784 commands, including 23 malware download attempts, and the sensor made <b>0 outbound connections</b>. The 17 Sigma rules cover all 12 playbook steps and are tested in CI, but haven't run against live traffic yet.</dd>
+        </dl>
+        <div class="links"><a href="/honeypot/">→ Project page</a><a href="/playbook-defense/">→ Playbook Defense</a><a href="https://github.com/NotKornFlakes/rust-telnet-sensor" target="_blank" rel="noopener">→ GitHub</a></div>
+      </article>
+
+    </div>
+    <div class="more"><a href="/portfolio/">→ All projects</a></div>
+  </section>
+
   <section id="writing">
-    <div class="sec-head"><span class="idx">05</span><h2>Writing</h2></div>
+    <div class="sec-head"><span class="idx">04</span><h2>Writing</h2></div>
     <ul class="posts">
       <li><a href="https://medium.com/@no1listeninghere/why-panic-is-powerful-confessions-from-the-help-desk-a4e94da824fd" target="_blank" rel="noopener">
         <span><span class="t">Why Panic Is Powerful: Confessions From the Help Desk</span><span class="d">How urgency is used in social engineering, seen from the support side.</span></span>

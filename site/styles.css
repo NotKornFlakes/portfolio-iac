@@ -305,6 +305,19 @@ ol.prose { padding-left: 22px; }
 .more { display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .hero .prose { margin-bottom: 24px; }
 
+/* Home page case studies: one per row. Problem / What I built / Tools /
+   Result sit in two columns on wide screens and stack on phones. */
+.cases { display: grid; gap: 18px; }
+.case dl { display: grid; grid-template-columns: 8.5em 1fr; gap: 12px 20px; margin: 4px 0 0; }
+.case dt { font-family: var(--mono); font-size: 13px; color: var(--accent); padding-top: 2px; }
+.case dd { margin: 0; font-size: 15px; }
+.case dd b { color: var(--accent); font-weight: 600; }
+.case .stack { margin-top: 0; padding-top: 0; }
+@media (max-width: 640px) {
+  .case dl { grid-template-columns: 1fr; gap: 2px; }
+  .case dd { margin-bottom: 12px; }
+}
+
 /* Portfolio cards: what each project means for a client */
 .card p.shows {
   color: var(--text); font-size: 14.5px; margin: 0 0 14px;
