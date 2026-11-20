@@ -320,7 +320,7 @@ ol.prose { padding-left: 22px; }
   .case dd { margin-bottom: 12px; }
 }
 
-/* Portfolio cards: what each project means for a client */
+/* Portfolio cards: what each project shows I can do */
 .card p.shows {
   color: var(--text); font-size: 14.5px; margin: 0 0 14px;
   padding-top: 12px; border-top: 1px solid var(--line);
