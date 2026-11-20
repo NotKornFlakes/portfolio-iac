@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Independent Work · Timothy Fletcher</title>
+<meta name="description" content="Automations, small custom tools and security basics for small businesses, nonprofits and grassroots groups, done on my own time, tested by me and handed over as code you own.">
+<link rel="canonical" href="https://timfletcher.tech/services/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/inter-4.001-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-2.211-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="/">tim<span>@</span>fletcher:~$</a>
+    <ul>
+      <li><a href="/#help">Services</a></li>
+      <li><a href="/#how-i-build">How I build</a></li>
+      <li><a href="/#about">About</a></li>
+      <li><a href="/portfolio/">Portfolio</a></li>
+      <li><a href="/#writing">Writing</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="wrap" id="top">
+
+  <header class="hero project">
+    <div class="back"><a href="/">← Home</a></div>
+    <div class="prompt">$ ./independent-work</div>
+    <h1>Independent work</h1>
+    <p class="summary">
+      Alongside my day job, I build automations, small tools and security basics for small businesses,
+      nonprofits and grassroots groups, and hand over code you own, with a plain-English guide to how it works.
+    </p>
+  </header>
+
+  <section id="help">
+    <div class="sec-head"><span class="idx">01</span><h2>What I can help with</h2></div>
+    <div class="projects offers">
+
+      <article class="card offer">
+        <div class="kicker">Automation</div>
+        <h3>Automate the repetitive stuff</h3>
+        <p><b>For:</b> teams doing the same tasks by hand in the apps they already use.</p>
+        <ul>
+          <li>Form answers sent straight to a spreadsheet, a CRM or the right person's inbox.</li>
+          <li>Reminders for invoices, renewals or follow-ups that send themselves.</li>
+          <li>Weekly summaries built and emailed automatically.</li>
+        </ul>
+        <p class="shows"><b>You get:</b> a workflow that runs on its own and alerts someone if it fails, so nothing breaks quietly.</p>
+        <div class="stack"><span>Python</span><span>REST APIs</span><span>Logic Apps</span><span>GitHub Actions</span></div>
+        <div class="links"><a href="/portfolio/#sentinel-soar">See an example: Sentinel SOAR →</a></div>
+      </article>
+
+      <article class="card offer">
+        <div class="kicker">Custom tools</div>
+        <h3>Small tools built for you</h3>
+        <p><b>For:</b> teams with a job off-the-shelf software doesn't quite fit.</p>
+        <ul>
+          <li>Cleaning up and combining messy spreadsheets or exports.</li>
+          <li>Dashboards that turn your data into a clear picture.</li>
+          <li>Scripts that run on a schedule and report back.</li>
+        </ul>
+        <p class="shows"><b>You get:</b> a Python script or simple dashboard built for that one job.</p>
+        <div class="stack"><span>Python</span><span>pandas</span><span>Plotly</span><span>Git</span></div>
+        <div class="links"><a href="/portfolio/#hhs-breach-analysis">See an example: HHS breach analysis →</a></div>
+      </article>
+
+      <article class="card offer">
+        <div class="kicker">Security basics</div>
+        <h3>A check-up for sign-ins, email and backups</h3>
+        <p><b>For:</b> small teams that want someone to check the basics.</p>
+        <ul>
+          <li>Microsoft 365 sign-in settings, admin accounts and old accounts that should be closed.</li>
+          <li>Email anti-spoofing records (SPF, DKIM, DMARC), so mail servers can reject email pretending to be you.</li>
+          <li>Backups: do they run, and could you actually restore from them?</li>
+        </ul>
+        <p class="shows"><b>You get:</b> a short, plain-English list of what to fix first and why.</p>
+        <div class="stack"><span>Microsoft 365</span><span>DNS and email records</span><span>Read-only access</span><span>Plain-English notes</span></div>
+        <div class="links"><a href="/portfolio/#this-website">See an example: this website's setup →</a></div>
+      </article>
+
+      <article class="card offer">
+        <div class="kicker">Free</div>
+        <h3>Open-source code and guides</h3>
+        <p><b>For:</b> anyone who'd rather do it themselves.</p>
+        <ul>
+          <li>Detection rules, firewall configs and deployment code on <a href="https://github.com/NotKornFlakes" target="_blank" rel="noopener">GitHub</a>.</li>
+          <li>Plain-language write-ups on <a href="https://medium.com/@no1listeninghere" target="_blank" rel="noopener">Medium</a>.</li>
+        </ul>
+        <p class="shows"><b>You get:</b> what I build and learn, for free. Security fixes are never kept behind a paywall.</p>
+        <div class="stack"><span>Open source</span><span>GitHub</span><span>Medium</span></div>
+        <div class="links"><a href="/portfolio/#playbook-defense">See an example: Playbook Defense →</a></div>
+      </article>
+
+    </div>
+    <p class="aside">Not sure which of these fits? Tell me what you're working on.</p>
+  </section>
+
+  <section id="how-i-build">
+    <div class="sec-head"><span class="idx">02</span><h2>How I build</h2></div>
+    <div class="prose">
+      <p>
+        I use Claude, Anthropic's AI assistant, to build faster. Then I read, test and document everything
+        myself before I hand it over.
+      </p>
+    </div>
+    <ul class="prose">
+      <li><b>Secure by default.</b> Each automation gets the least access it needs. Passwords and keys aren't stored in plain text, and data isn't kept longer than the job needs.</li>
+      <li><b>Reliable.</b> I test with real examples, and anything that runs on its own tells someone when it fails.</li>
+      <li><b>Yours to keep.</b> The code, accounts and tools stay in your name, and everything is documented, so you aren't locked into me.</li>
+      <li><b>Permission in writing.</b> I don't touch a system without written agreement on what's allowed.</li>
+      <li><b>No kickbacks.</b> I don't earn commissions on tools I recommend. Free and open-source comes first.</li>
+      <li><b>Separate from my day job.</b> This is independent work, done on my own time and equipment.</li>
+    </ul>
+    <div class="callout">
+      <p><b>What I take on, and what I don't.</b> I'm open to new projects now: small, well-scoped work, like one workflow, one tool or one check-up. I'm not a 24/7 IT provider, a penetration-testing firm or a compliance auditor. If you need one of those, I'll help you find someone who can.</p>
+    </div>
+  </section>
+
+  <section id="process">
+    <div class="sec-head"><span class="idx">03</span><h2>How it works</h2></div>
+    <ol class="prose">
+      <li><b>Email me</b> with a sentence or two about what you need.</li>
+      <li><b>I reply</b> with questions or an honest answer. If an existing tool already does the job, I'll tell you.</li>
+      <li><b>A call, only if we need one:</b> a Proton Meet video call or a regular phone call, whichever you prefer.</li>
+      <li><b>A written plan</b> before any work starts: what I'll build, what access it needs, and what you'll get.</li>
+      <li><b>Build, test and hand over</b>, in a GitHub repository you own, with a short guide on how it works and what to do if it stops.</li>
+    </ol>
+  </section>
+
+  <section id="contact">
+    <div class="contact">
+      <h2>Tell me what you need</h2>
+      <p>A sentence or two is enough to start. If it helps to talk, we can set up a call.</p>
+      <div class="buttons">
+        <a class="btn primary" href="mailto:workwithtim@proton.me?subject=Work%20with%20me">Email workwithtim@proton.me</a>
+        <a class="btn" href="https://www.linkedin.com/in/timcfletch" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Timothy Fletcher</span>
+    <span>Deployed by GitHub Actions + Terraform on <code>Cloudflare Workers</code> · <a href="https://github.com/NotKornFlakes/portfolio-iac" target="_blank" rel="noopener">view source</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
