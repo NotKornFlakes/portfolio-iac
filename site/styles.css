@@ -298,8 +298,8 @@ header.hero.home h1 { font-size: clamp(30px, 4.6vw, 44px); line-height: 1.15; ma
 }
 .byline { font-size: 15px; color: var(--muted); margin: 0 0 20px; }
 
-/* Service cards reuse .card */
-.offer .stack span { white-space: nowrap; }
+/* Service and skill cards reuse .card */
+.offer .stack span, .skill-card .stack span { white-space: nowrap; }
 .aside { margin: 22px 0 0; color: var(--muted); font-size: 15.5px; max-width: 720px; }
 ol.prose { padding-left: 22px; }
 .more { display: flex; flex-wrap: wrap; gap: 8px 20px; }
