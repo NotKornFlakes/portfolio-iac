@@ -216,7 +216,6 @@ h2 { font-size: 26px; margin: 0; letter-spacing: -0.01em; }
 .contact .buttons { justify-content: center; }
 footer { border-top: 1px solid var(--line); padding: 28px 0 40px; margin-top: 8px; }
 footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13.5px; color: var(--muted); }
-footer code { font-family: var(--mono); font-size: 12.5px; color: var(--accent); }
 
 /* 404 page */
 .notfound { font-family: system-ui, sans-serif; text-align: center; margin-top: 80px; }
@@ -332,5 +331,5 @@ ol.prose { padding-left: 22px; }
 .contact p.fine { font-size: 14.5px; margin: 16px auto 0; }
 .contact p.fine + p.fine { margin-top: 6px; }
 
-nav ul a[aria-current="page"] { color: var(--text); }
+footer a[aria-current="page"] { color: var(--text); }
 @media (min-width: 641px) and (max-width: 860px) { nav ul { gap: 14px; } }
